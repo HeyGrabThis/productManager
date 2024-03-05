@@ -14,6 +14,26 @@ function App() {
     setOrder(copy);
   };
 
+  //선택하면 order상태 1로, 다시 해제하면 0으로. 상태 알 수 있음
+  const changeCheck = (idx) => {
+    if (order[idx] === 0) {
+      let copy = [...order];
+      copy[idx] += 1;
+      setOrder(copy);
+    } else {
+      let copy = [...order];
+      copy[idx] -= 1;
+      setOrder(copy);
+    }
+  };
+
+  //삭제버튼 누르면 선택한 항목 삭제하기
+  const deleteOrder = () => {
+    if (order.indexOf(1) === -1) {
+      alert('선택한 항목이 없습니다');
+    } else {
+    }
+  };
   return (
     <div className="App">
       <div className="header">
@@ -24,7 +44,13 @@ function App() {
           <button id="saveBtn" type="button">
             저장하기
           </button>
-          <button id="deleteBtn" type="button">
+          <button
+            id="deleteBtn"
+            type="button"
+            onClick={() => {
+              deleteOrder();
+            }}
+          >
             선택삭제
           </button>
           <button
@@ -57,28 +83,42 @@ function App() {
           <tbody>
             {order.map((elm, idx) => {
               return (
-                <tr>
+                <tr key={idx}>
                   <td>
-                    <input type="checkbox" name="check" id="check" />
+                    <input
+                      type="checkbox"
+                      name="check"
+                      id="check"
+                      onChange={() => {
+                        changeCheck(idx);
+                      }}
+                    />
                   </td>
                   <td>
                     <input
                       type="text"
                       className="text"
                       placeholder="발주번호를 입력해주세요"
+                      onChange={() => {}}
                     />
                   </td>
                   <td>
-                    <input type="date" />
+                    <input type="date" onChange={() => {}} />
                   </td>
                   <td className="checkbox">
-                    <input type="checkbox" name="emergency" id="emergency" />
+                    <input
+                      type="checkbox"
+                      name="emergency"
+                      id="emergency"
+                      onChange={() => {}}
+                    />
                   </td>
                   <td>
                     <input
                       type="text"
                       className="text"
                       placeholder="고객사를 입력해주세요"
+                      onChange={() => {}}
                     />
                   </td>
                   <td>
@@ -86,6 +126,7 @@ function App() {
                       type="text"
                       className="text"
                       placeholder="품목코드를 입력해주세요"
+                      onChange={() => {}}
                     />
                   </td>
                   <td>
@@ -93,13 +134,19 @@ function App() {
                       type="text"
                       className="text"
                       placeholder="품목명을 입력해주세요"
+                      onChange={() => {}}
                     />
                   </td>
                   <td>
-                    <input type="number" min={0} value={0} />
+                    <input
+                      type="number"
+                      min={0}
+                      value={0}
+                      onChange={() => {}}
+                    />
                   </td>
                   <td>
-                    <input type="date" />
+                    <input type="date" onChange={() => {}} />
                   </td>
                   <td>
                     <textarea
@@ -108,6 +155,7 @@ function App() {
                       cols="20"
                       rows="2"
                       className="text"
+                      onChange={() => {}}
                     ></textarea>
                   </td>
                 </tr>
