@@ -102,6 +102,7 @@ function App() {
     let copy = [...order];
     copy[idx].quantity = value;
     setOrder(copy);
+    console.log(value);
   };
   // 마감날짜 변경함수
   const changeEndDay = (idx, value) => {
@@ -258,7 +259,6 @@ function App() {
                     <input
                       type="number"
                       min={0}
-                      value={0}
                       onChange={(e) => {
                         changeQuantity(idx, e.target.value);
                       }}
