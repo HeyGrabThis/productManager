@@ -102,7 +102,6 @@ function App() {
     let copy = [...order];
     copy[idx].quantity = value;
     setOrder(copy);
-    console.log(value);
   };
   // 마감날짜 변경함수
   const changeEndDay = (idx, value) => {
@@ -122,18 +121,19 @@ function App() {
     if (checked.indexOf(1) === -1) {
       alert('선택한 항목이 없습니다');
     } else {
-      // 현재 order배열의 1은 모두 삭제되지만 그게 html에 내가 선택한 요소가 삭제되지는 않는 문제가 있음.
-      // let copy = [...order];
-      // let checkedOrder = order.filter((elm) => {
-      //   return elm === 1;
-      // });
-      // for (let i = checkedOrder.length; i > 0; i--) {
-      //   let one = copy.findIndex((elm) => {
-      //     return elm === 1;
-      //   });
-      //   copy.splice(one, 1);
-      //   console.log(copy);
-      //   setOrder(copy);
+      if (window.confirm('선택한 항목을 삭제하시겠습니까?')) {
+        let copy = [...order];
+        // filter 말고 map쓰면 없어진 부분이 undefined로 나옴
+        let copy2 = copy.filter((elm) => {
+          if (elm.checked === 0) {
+            return elm;
+          }
+        });
+        console.log(copy2);
+        setOrder(copy2);
+      }
+      // html화면에 input이기 때문에 값이 적용되지 않는 문제...
+      // input value로 입력받은 값을 다시 value로 되돌려주거나 하는 생각...
     }
   };
 
@@ -192,6 +192,7 @@ function App() {
                       type="checkbox"
                       name="check"
                       id="check"
+                      // value={order[idx].checked}
                       onChange={() => {
                         changeCheck(idx);
                       }}
@@ -202,6 +203,7 @@ function App() {
                       type="text"
                       className="text"
                       placeholder="발주번호를 입력해주세요"
+                      // value={order[idx].orderCode}
                       onChange={(e) => {
                         changeOrderCode(idx, e.target.value);
                       }}
