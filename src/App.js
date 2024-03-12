@@ -6,35 +6,26 @@ function App() {
   let thisYear = nowDate.getFullYear();
   let thisMonth = nowDate.getMonth() + 1;
 
-  // 발주 추가버튼 누르면 행 추가하기
-  let [order, setOrder] = useState([
-    {
-      checked: 0,
-      orderCode: '',
-      startDay: '',
-      emergency: 0,
-      company: '',
-      productCode: '',
-      productName: '',
-      quantity: 0,
-      endDay: '',
-      etc: '',
-    },
-  ]);
+  // 주문 목록 state
+  let [order, setOrder] = useState([]);
+
+  // input에 빈칸을 남길, order state에 추가할 state 생성
+  let [orderCopy, setOrderCopy] = useState({
+    checked: 0,
+    orderCode: '',
+    startDay: '',
+    emergency: 0,
+    company: '',
+    productCode: '',
+    productName: '',
+    quantity: 0,
+    endDay: '',
+    etc: '',
+  });
+  // 발주 추가하기
   const addOrder = () => {
     let copy = [...order];
-    copy.push({
-      checked: 0,
-      orderCode: '',
-      startDay: '',
-      emergency: 0,
-      company: '',
-      productCode: '',
-      productName: '',
-      quantity: 0,
-      endDay: '',
-      etc: '',
-    });
+    copy.push(orderCopy);
     setOrder(copy);
   };
   //checked만 따로 모아둔 배열 생성
@@ -55,65 +46,65 @@ function App() {
     }
   };
 
-  // 발주번호 입력시 state 변경함수
-  const changeOrderCode = (idx, value) => {
-    let copy = [...order];
-    copy[idx].orderCode = value;
-    setOrder(copy);
+  // 발주번호 입력함수
+  const changeOrderCode = (value) => {
+    let copy = { ...orderCopy };
+    copy.orderCode = value;
+    setOrderCopy(copy);
   };
-  // 발주일 입력시 state 변경함수
-  const changeStartDay = (idx, value) => {
-    let copy = [...order];
-    copy[idx].startDay = value;
-    setOrder(copy);
+  // 발주일 입력함수
+  const changeStartDay = (value) => {
+    let copy = { ...orderCopy };
+    copy.startDay = value;
+    setOrderCopy(copy);
   };
   // 긴급발주 입력시 state 변경함수
-  const changeEmergency = (idx) => {
-    if (order[idx].emergency === 0) {
-      let copy = [...order];
-      copy[idx].emergency += 1;
-      setOrder(copy);
+  const changeEmergency = () => {
+    if (orderCopy.emergency === 0) {
+      let copy = { ...orderCopy };
+      copy.emergency += 1;
+      setOrderCopy(copy);
     } else {
-      let copy = [...order];
-      copy[idx].emergency -= 1;
-      setOrder(copy);
+      let copy = { ...orderCopy };
+      copy.emergency -= 1;
+      setOrderCopy(copy);
     }
   };
-  // 고객사 변경함수
-  const changeCompany = (idx, value) => {
-    let copy = [...order];
-    copy[idx].company = value;
-    setOrder(copy);
+  // 고객사 입력함수
+  const changeCompany = (value) => {
+    let copy = { ...orderCopy };
+    copy.company = value;
+    setOrderCopy(copy);
   };
-  // 품목코드 변경함수
-  const changeProductCode = (idx, value) => {
-    let copy = [...order];
-    copy[idx].productCode = value;
-    setOrder(copy);
+  // 품목코드 입력함수
+  const changeProductCode = (value) => {
+    let copy = { ...orderCopy };
+    copy.productCode = value;
+    setOrderCopy(copy);
   };
-  // 품목명 변경함수
-  const changeProductName = (idx, value) => {
-    let copy = [...order];
-    copy[idx].productName = value;
-    setOrder(copy);
+  // 품목명 입력함수
+  const changeProductName = (value) => {
+    let copy = { ...orderCopy };
+    copy.productName = value;
+    setOrderCopy(copy);
   };
-  // 개수 변경함수
-  const changeQuantity = (idx, value) => {
-    let copy = [...order];
-    copy[idx].quantity = value;
-    setOrder(copy);
+  // 개수 입력함수
+  const changeQuantity = (value) => {
+    let copy = { ...orderCopy };
+    copy.quantity = value;
+    setOrderCopy(copy);
   };
-  // 마감날짜 변경함수
-  const changeEndDay = (idx, value) => {
-    let copy = [...order];
-    copy[idx].endDay = value;
-    setOrder(copy);
+  // 마감날짜 입력함수
+  const changeEndDay = (value) => {
+    let copy = { ...orderCopy };
+    copy.endDay = value;
+    setOrderCopy(copy);
   };
-  // 비고 변경함수
-  const changeEtc = (idx, value) => {
-    let copy = [...order];
-    copy[idx].etc = value;
-    setOrder(copy);
+  // 비고 입력함수
+  const changeEtc = (value) => {
+    let copy = { ...orderCopy };
+    copy.etc = value;
+    setOrderCopy(copy);
   };
 
   //삭제버튼 누르면 선택한 항목 삭제하기
@@ -129,7 +120,6 @@ function App() {
             return elm;
           }
         });
-        console.log(copy2);
         setOrder(copy2);
       }
       // html화면에 input이기 때문에 값이 적용되지 않는 문제...
@@ -156,15 +146,6 @@ function App() {
           >
             선택삭제
           </button>
-          <button
-            id="addBtn"
-            type="button"
-            onClick={() => {
-              addOrder();
-            }}
-          >
-            발주추가
-          </button>
         </div>
       </div>
       <div className="main">
@@ -181,116 +162,186 @@ function App() {
               <th>발주수량</th>
               <th>납기일</th>
               <th>비고</th>
+              <th className="modifyBtn-border"> </th>
             </tr>
           </thead>
           <tbody>
             {order.map((elm, idx) => {
               return (
-                <tr key={idx}>
+                <tr
+                  key={idx}
+                  style={
+                    order[idx].emergency === 1
+                      ? { background: '#ffb49c' }
+                      : { background: 'white' }
+                  }
+                >
                   <td>
                     <input
                       type="checkbox"
                       name="check"
                       id="check"
-                      // value={order[idx].checked}
                       onChange={() => {
                         changeCheck(idx);
                       }}
+                      checked={order[idx].checked}
                     />
                   </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="text"
-                      placeholder="발주번호를 입력해주세요"
-                      // value={order[idx].orderCode}
-                      onChange={(e) => {
-                        changeOrderCode(idx, e.target.value);
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="date"
-                      onChange={(e) => {
-                        changeStartDay(idx, e.target.value);
-                      }}
-                    />
-                  </td>
-                  <td className="checkbox">
-                    <input
-                      type="checkbox"
-                      name="emergency"
-                      id="emergency"
-                      onChange={() => {
-                        changeEmergency(idx);
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="text"
-                      placeholder="고객사를 입력해주세요"
-                      onChange={(e) => {
-                        changeCompany(idx, e.target.value);
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="text"
-                      placeholder="품목코드를 입력해주세요"
-                      onChange={(e) => {
-                        changeProductCode(idx, e.target.value);
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="text"
-                      placeholder="품목명을 입력해주세요"
-                      onChange={(e) => {
-                        changeProductName(idx, e.target.value);
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      min={0}
-                      onChange={(e) => {
-                        changeQuantity(idx, e.target.value);
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="date"
-                      onChange={(e) => {
-                        changeEndDay(idx, e.target.value);
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <textarea
-                      name="etc"
-                      id="etc"
-                      cols="20"
-                      rows="2"
-                      className="text"
-                      onChange={(e) => {
-                        changeEtc(idx, e.target.value);
-                      }}
-                    ></textarea>
+                  <td>{order[idx].orderCode}</td>
+                  <td>{order[idx].startDay}</td>
+                  <td>{order[idx].emergency === 1 ? '✔️' : ''}</td>
+                  <td>{order[idx].company}</td>
+                  <td>{order[idx].productCode}</td>
+                  <td>{order[idx].productName}</td>
+                  <td>{order[idx].quantity}</td>
+                  <td>{order[idx].endDay}</td>
+                  <td className="etc">{order[idx].etc}</td>
+                  <td className="modifyBtn-border">
+                    <button>수정</button>
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
+      </div>
+      <div className="inputPart">
+        <table>
+          <thead>
+            <tr>
+              <th>발주번호</th>
+              <th>발주일</th>
+              <th>긴급</th>
+              <th>고객사</th>
+              <th>품목코드</th>
+              <th>품목명</th>
+              <th>발주수량</th>
+              <th>납기일</th>
+              <th>비고</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input
+                  type="text"
+                  className="text"
+                  placeholder="발주번호를 입력해주세요"
+                  onChange={(e) => {
+                    changeOrderCode(e.target.value);
+                  }}
+                  value={orderCopy.orderCode}
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  onChange={(e) => {
+                    changeStartDay(e.target.value);
+                  }}
+                  value={orderCopy.startDay}
+                />
+              </td>
+              <td className="checkbox">
+                <input
+                  type="checkbox"
+                  name="emergency"
+                  id="emergency"
+                  onChange={() => {
+                    changeEmergency();
+                  }}
+                  checked={orderCopy.emergency}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  className="text"
+                  placeholder="고객사를 입력해주세요"
+                  onChange={(e) => {
+                    changeCompany(e.target.value);
+                  }}
+                  value={orderCopy.company}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  className="text"
+                  placeholder="품목코드를 입력해주세요"
+                  onChange={(e) => {
+                    changeProductCode(e.target.value);
+                  }}
+                  value={orderCopy.productCode}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  className="text"
+                  placeholder="품목명을 입력해주세요"
+                  onChange={(e) => {
+                    changeProductName(e.target.value);
+                  }}
+                  value={orderCopy.productName}
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  min={0}
+                  onChange={(e) => {
+                    changeQuantity(e.target.value);
+                  }}
+                  value={orderCopy.quantity}
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  onChange={(e) => {
+                    changeEndDay(e.target.value);
+                  }}
+                  value={orderCopy.endDay}
+                />
+              </td>
+              <td>
+                <textarea
+                  name="etc"
+                  id="etc"
+                  cols="20"
+                  rows="2"
+                  className="text"
+                  onChange={(e) => {
+                    changeEtc(e.target.value);
+                  }}
+                  value={orderCopy.etc}
+                ></textarea>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button
+          id="addBtn"
+          type="button"
+          onClick={() => {
+            addOrder();
+            setOrderCopy({
+              checked: 0,
+              orderCode: '',
+              startDay: '',
+              emergency: 0,
+              company: '',
+              productCode: '',
+              productName: '',
+              quantity: 0,
+              endDay: '',
+              etc: '',
+            });
+          }}
+        >
+          추가하기
+        </button>
       </div>
     </div>
   );
