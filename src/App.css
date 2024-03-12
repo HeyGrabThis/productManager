@@ -70,9 +70,23 @@ input[type='text'] {
 }
 /* 밑의 부분 */
 /* 고정하고 중앙 정렬 */
+.tail {
+  position: fixed;
+  bottom: 0;
+  height: 25vh;
+  width: 100vw;
+  background-color: rgb(182, 182, 182);
+}
 .inputPart {
   position: fixed;
-  bottom: 10vh;
+  bottom: 7vh;
   margin-left: 50%;
   transform: translate(-50%, 0);
+}
+.inputPart table {
+  background-color: white;
+}
+.inputPart button {
+  width: 5vw;
+  height: 5vh;
 }
