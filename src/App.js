@@ -161,19 +161,34 @@ function App() {
 
   // 각 항목 수정버튼 누르면 input 부분으로 옮겨오는 함수
   const modifyProduct = (idx) => {
-    if (
-      window.confirm('현재 작성하고 있던 정보는 사라집니다. 수정하시겠습니까?')
-    ) {
-      let copy = { ...order[idx] };
-      setOrderCopy(copy);
-      //버튼 수정완료로 바꿔주기
-      setAddBtn(1);
+    //이미 수정중이라면 먼저 수정을 완료할 것을 강요
+    if (addState !== -1) {
+      alert('현재 항목 수정중입니다. 수정을 완료해주세요.');
+    } else {
+      if (
+        window.confirm(
+          '현재 작성하고 있던 정보는 사라집니다. 수정하시겠습니까?'
+        )
+      ) {
+        let copy = { ...order[idx] };
+        setOrderCopy(copy);
+        //버튼 수정완료로 바꿔주면서 수정하는 인덱스로 상태 바꿔주기
+        setAddState(idx);
+      }
     }
   };
 
-  // 추가하기(0), 수정완료(1) 버튼 ui 교체 state
-  let [addBtn, setAddBtn] = useState(-1);
+  // 추가하기(-1), 수정완료(수정하는 idx) 버튼 ui 교체 state
+  let [addState, setAddState] = useState(-1);
 
+  // 수정완료한 값들 다시 원래 배열에 넣기
+  const addModify = (idx) => {
+    let copy = [...order];
+    copy[idx] = orderCopy;
+    setOrder(copy);
+    // 버튼 '추가하기'로 바꿔야하고 ui state 수정
+    setAddState(-1);
+  };
   return (
     <div className="App">
       <div className="header">
@@ -387,31 +402,71 @@ function App() {
               </tr>
             </tbody>
           </table>
-          <button
-            id="addBtn"
-            type="button"
-            onClick={() => {
-              addOrder();
-              setOrderCopy({
-                checked: 0,
-                orderCode: '',
-                startDay: '',
-                emergency: 0,
-                company: '',
-                productCode: '',
-                productName: '',
-                quantity: 0,
-                endDay: '',
-                etc: '',
-              });
-            }}
-          >
-            {addBtn === -1 ? '추가하기' : '수정완료'}
-          </button>
+          {/* 상황에 따라 추가하기 버튼과 수정하기 버튼으로 바꾸기 */}
+          {addState === -1 ? (
+            <AddBtn addOrder={addOrder} setOrderCopy={setOrderCopy} />
+          ) : (
+            <AddModifyBtn
+              addModify={addModify}
+              setOrderCopy={setOrderCopy}
+              addState={addState}
+            />
+          )}
         </div>
       </div>
     </div>
   );
 }
+
+const AddBtn = (props) => {
+  return (
+    <button
+      id="addBtn"
+      type="button"
+      onClick={() => {
+        props.addOrder();
+        props.setOrderCopy({
+          checked: 0,
+          orderCode: '',
+          startDay: '',
+          emergency: 0,
+          company: '',
+          productCode: '',
+          productName: '',
+          quantity: 0,
+          endDay: '',
+          etc: '',
+        });
+      }}
+    >
+      추가하기
+    </button>
+  );
+};
+
+const AddModifyBtn = (props) => {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        props.addModify(props.addState);
+        props.setOrderCopy({
+          checked: 0,
+          orderCode: '',
+          startDay: '',
+          emergency: 0,
+          company: '',
+          productCode: '',
+          productName: '',
+          quantity: 0,
+          endDay: '',
+          etc: '',
+        });
+      }}
+    >
+      수정완료
+    </button>
+  );
+};
 
 export default App;
