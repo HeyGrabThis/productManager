@@ -189,6 +189,192 @@ function App() {
     // 버튼 '추가하기'로 바꿔야하고 ui state 수정
     setAddState(-1);
   };
+
+  // 발주번호 정렬
+  // const sortOrderCode = () => {
+  //   let copy = [...order];
+  //   // 발주번호에 '-'가 있는 경우 이걸 없애고 순서까지 담은 배열 생성.
+  //   let copy2 = copy.map((elm, idx) => {
+  //     let c = elm.orderCode.replace('-', '');
+  //     let d = idx;
+  //     return { c, d };
+  //   });
+  //   // copy2의 '-'를 없앤 발주번호에 따라 정렬하고 순서만 뽑은 배열 생성
+  //   let copy3 = copy2
+  //     .toSorted((a, b) => a.c - b.c)
+  //     .map((elm) => {
+  //       return elm.d;
+  //     });
+  //   // copy3의 값을 아까 복사해둔 copy의 순서에 넣어 새로운 배열 생성
+  //   let copy4 = copy3.map((elm) => {
+  //     return copy[elm];
+  //   });
+  //   setOrder(copy4);
+  // };
+  // 발주번호 정렬
+  // 위 코드 간단하게 만듦
+  const sortOrderCode = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted(
+        (a, b) => a.orderCode.replace('-', '') - b.orderCode.replace('-', '')
+      );
+      setOrder(copy);
+    }
+  };
+  const reverseSortOrderCode = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted(
+        (a, b) => b.orderCode.replace('-', '') - a.orderCode.replace('-', '')
+      );
+      setOrder(copy);
+    }
+  };
+
+  //발주일 정렬
+  const sortStartDay = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted(
+        (a, b) => new Date(a.startDay) - new Date(b.startDay)
+      );
+      setOrder(copy);
+    }
+  };
+  const reverseSortStartDay = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted(
+        (a, b) => new Date(b.startDay) - new Date(a.startDay)
+      );
+      setOrder(copy);
+    }
+  };
+
+  // 긴급발주 정렬
+  const sortEmergency = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted((a, b) => b.emergency - a.emergency);
+      setOrder(copy);
+    }
+  };
+  const reverseSortEmergency = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted((a, b) => a.emergency - b.emergency);
+      setOrder(copy);
+    }
+  };
+
+  // 고객사 정렬
+  const sortCompany = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted((a, b) => a.company.localeCompare(b.company));
+      setOrder(copy);
+    }
+  };
+  const reverseSortCompany = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted((a, b) => b.company.localeCompare(a.company));
+      setOrder(copy);
+    }
+  };
+
+  // 품목코드 정렬
+  const sortProductCode = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted((a, b) =>
+        a.productCode.localeCompare(b.productCode)
+      );
+      setOrder(copy);
+    }
+  };
+  const reverseSortProductCode = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted((a, b) =>
+        b.productCode.localeCompare(a.productCode)
+      );
+      setOrder(copy);
+    }
+  };
+
+  // 품목명 정렬
+  const sortProductName = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted((a, b) =>
+        a.productName.localeCompare(b.productName)
+      );
+      setOrder(copy);
+    }
+  };
+  const reverseSortProductName = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted((a, b) =>
+        b.productName.localeCompare(a.productName)
+      );
+      setOrder(copy);
+    }
+  };
+
+  // 발주수량 정렬
+  const sortQuantity = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted((a, b) => a.quantity - b.quantity);
+      setOrder(copy);
+    }
+  };
+  const reverseSortQuantity = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted((a, b) => b.quantity - a.quantity);
+      setOrder(copy);
+    }
+  };
+
+  //납기일 정렬
+  const sortEndDay = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted(
+        (a, b) => new Date(a.endDay) - new Date(b.endDay)
+      );
+      setOrder(copy);
+    }
+  };
+  const reverseSortEndDay = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      let copy = order.toSorted(
+        (a, b) => new Date(b.endDay) - new Date(a.endDay)
+      );
+      setOrder(copy);
+    }
+  };
   return (
     <div className="App">
       <div className="header">
@@ -226,14 +412,142 @@ function App() {
                   checked={allChecked === 1 && anyChecked === 1 ? true : false}
                 />
               </th>
-              <th>발주번호</th>
-              <th>발주일</th>
-              <th>긴급발주</th>
-              <th>고객사</th>
-              <th>품목코드</th>
-              <th>품목명</th>
-              <th>발주수량</th>
-              <th>납기일</th>
+              <th>
+                발주번호
+                <button
+                  onClick={() => {
+                    sortOrderCode();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortOrderCode();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
+              <th>
+                발주일
+                <button
+                  onClick={() => {
+                    sortStartDay();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortStartDay();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
+              <th>
+                긴급발주
+                <button
+                  onClick={() => {
+                    sortEmergency();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortEmergency();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
+              <th>
+                고객사
+                <button
+                  onClick={() => {
+                    sortCompany();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortCompany();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
+              <th>
+                품목코드
+                <button
+                  onClick={() => {
+                    sortProductCode();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortProductCode();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
+              <th>
+                품목명
+                <button
+                  onClick={() => {
+                    sortProductName();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortProductName();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
+              <th>
+                발주수량
+                <button
+                  onClick={() => {
+                    sortQuantity();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortQuantity();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
+              <th>
+                납기일
+                <button
+                  onClick={() => {
+                    sortEndDay();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortEndDay();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
               <th>비고</th>
               <th className="modifyBtn-border"> </th>
             </tr>
