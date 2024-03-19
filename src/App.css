@@ -10,6 +10,11 @@ body {
   flex-direction: column;
   justify-content: center;
 }
+/* input부분 위쪽 사용가능하게끔 스크롤 기능 */
+.scroll {
+  height: 74.5vh;
+  overflow-y: scroll;
+}
 table,
 th,
 td {
@@ -50,8 +55,18 @@ tbody tr .checkbox input {
   margin-top: -6.5px;
   margin-left: -6.5px;
 }
+/* 밑의 발주번호 */
+tbody tr .orderCodeInput {
+  position: relative;
+  min-width: 8vw;
+}
+tbody tr .orderCodeInput div {
+  display: inline-block;
+}
+
 .etc {
-  max-width: 350px;
+  max-width: 300px;
+  word-break: break-all;
 }
 /* textarea조정 */
 textarea {
@@ -66,7 +81,6 @@ input[type='text'] {
   border-right: hidden;
   border-top: hidden;
   border-bottom: hidden;
-  /* background-color: none; */
 }
 /* 밑의 부분 */
 /* 고정하고 중앙 정렬 */

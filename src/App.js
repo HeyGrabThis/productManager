@@ -3,9 +3,38 @@ import './App.css';
 
 function App() {
   let nowDate = new Date();
-  let thisYear = nowDate.getFullYear();
-  let thisMonth = nowDate.getMonth() + 1;
+  let nowYear = nowDate.getFullYear();
+  let nowMonth = nowDate.getMonth() + 1;
 
+  // 달 이동 함수
+  let [thisMonthYear, setThisMonthYear] = useState({
+    month: nowMonth,
+    year: nowYear,
+  });
+  const preMonth = () => {
+    if (thisMonthYear.month === 1) {
+      let copy = { ...thisMonthYear };
+      copy.month = 12;
+      copy.year -= 1;
+      setThisMonthYear(copy);
+    } else {
+      let copy = { ...thisMonthYear };
+      copy.month -= 1;
+      setThisMonthYear(copy);
+    }
+  };
+  const nextMonth = () => {
+    if (thisMonthYear.month === 12) {
+      let copy = { ...thisMonthYear };
+      copy.month = 1;
+      copy.year += 1;
+      setThisMonthYear(copy);
+    } else {
+      let copy = { ...thisMonthYear };
+      copy.month += 1;
+      setThisMonthYear(copy);
+    }
+  };
   // 주문 목록 state
   let [order, setOrder] = useState([]);
 
@@ -80,16 +109,61 @@ function App() {
     haveAnyChecked();
   };
 
-  // 발주번호 입력함수
-  const changeOrderCode = (value) => {
-    let copy = { ...orderCopy };
-    copy.orderCode = value;
-    setOrderCopy(copy);
-  };
-  // 발주일 입력함수
+  // 발주일 입력함수. 발주일 입력하면 발주번호 자동으로 입력
   const changeStartDay = (value) => {
     let copy = { ...orderCopy };
     copy.startDay = value;
+
+    // 입력값에서 앞의 6자리 따오기
+    let orderCodeDate =
+      `${value[2]}` +
+      `${value[3]}` +
+      `${value[5]}` +
+      `${value[6]}` +
+      `${value[8]}` +
+      `${value[9]}`;
+    // orderCode목록에서 앞의 6글자 겹치는 것 있는지 확인하고 있으면 뒤의 두글자 숫자배열로 반환
+    let sameOrderCodeDateArray = order.map((elm) => {
+      if (elm.orderCode.substring(0, 6) === orderCodeDate) {
+        return Number(elm.orderCode.substring(7, 9));
+      }
+    });
+    // 뒤의 두 숫자 배열 내림차순으로 정렬
+    let sameOrderCodeTopId = sameOrderCodeDateArray.sort((a, b) => b - a);
+
+    // 내림차순으로 정렬한 숫자중 가장 앞의 큰값 있는지 확인
+    // 있다면 +1해서 적용, 없다면 그냥 01로
+    if (sameOrderCodeTopId[0]) {
+      copy.orderCode =
+        `${value[2]}` +
+        `${value[3]}` +
+        `${value[5]}` +
+        `${value[6]}` +
+        `${value[8]}` +
+        `${value[9]}` +
+        `-` +
+        `${String(sameOrderCodeTopId[0] + 1).padStart(2, '0')}`;
+    } else {
+      copy.orderCode =
+        `${value[2]}` +
+        `${value[3]}` +
+        `${value[5]}` +
+        `${value[6]}` +
+        `${value[8]}` +
+        `${value[9]}` +
+        `-` +
+        `01`;
+    }
+    // 납기일 자동 설정
+    const startDayCopy = new Date(value);
+    let endDayCopy = new Date(startDayCopy);
+    endDayCopy.setDate(startDayCopy.getDate() + 9);
+    copy.endDay =
+      endDayCopy.getFullYear() +
+      '-' +
+      String(endDayCopy.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(endDayCopy.getDate()).padStart(2, '0');
     setOrderCopy(copy);
   };
   // 긴급발주 입력시 state 변경함수
@@ -156,6 +230,19 @@ function App() {
         });
         setOrder(copy2);
       }
+    }
+  };
+
+  // 리스트에 있는 긴급발주 checkbox로 긴급발주 state수정
+  const changeListEmergency = (idx) => {
+    if (order[idx].emergency === 1) {
+      let copy = [...order];
+      copy[idx].emergency = 0;
+      setOrder(copy);
+    } else {
+      let copy = [...order];
+      copy[idx].emergency = 1;
+      setOrder(copy);
     }
   };
 
@@ -377,234 +464,264 @@ function App() {
   };
   return (
     <div className="App">
-      <div className="header">
-        <h1 id="title">
-          {thisYear}년 {thisMonth}월 발주 관리
-        </h1>
-        <div>
-          <button id="saveBtn" type="button">
-            저장하기
-          </button>
-          <button
-            id="deleteBtn"
-            type="button"
-            onClick={() => {
-              deleteOrder();
-            }}
-          >
-            선택삭제
-          </button>
+      <div className="scroll">
+        <div className="header">
+          <h1 id="title">
+            <button
+              onClick={() => {
+                preMonth();
+              }}
+            >
+              ◀︎
+            </button>
+            {thisMonthYear.year}년 {thisMonthYear.month}월 발주 관리
+            <button
+              onClick={() => {
+                nextMonth();
+              }}
+            >
+              ▶︎
+            </button>
+          </h1>
+          <div>
+            <button id="saveBtn" type="button">
+              저장하기
+            </button>
+            <button
+              id="deleteBtn"
+              type="button"
+              onClick={() => {
+                deleteOrder();
+              }}
+            >
+              선택삭제
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="main">
-        <table>
-          <thead>
-            <tr>
-              <th>
-                선택
-                <input
-                  type="checkbox"
-                  name="allCheck"
-                  id="allCheck"
-                  onChange={() => {
-                    checkAll();
-                  }}
-                  checked={allChecked === 1 && anyChecked === 1 ? true : false}
-                />
-              </th>
-              <th>
-                발주번호
-                <button
-                  onClick={() => {
-                    sortOrderCode();
-                  }}
-                >
-                  ▼
-                </button>
-                <button
-                  onClick={() => {
-                    reverseSortOrderCode();
-                  }}
-                >
-                  ▲
-                </button>
-              </th>
-              <th>
-                발주일
-                <button
-                  onClick={() => {
-                    sortStartDay();
-                  }}
-                >
-                  ▼
-                </button>
-                <button
-                  onClick={() => {
-                    reverseSortStartDay();
-                  }}
-                >
-                  ▲
-                </button>
-              </th>
-              <th>
-                긴급발주
-                <button
-                  onClick={() => {
-                    sortEmergency();
-                  }}
-                >
-                  ▼
-                </button>
-                <button
-                  onClick={() => {
-                    reverseSortEmergency();
-                  }}
-                >
-                  ▲
-                </button>
-              </th>
-              <th>
-                고객사
-                <button
-                  onClick={() => {
-                    sortCompany();
-                  }}
-                >
-                  ▼
-                </button>
-                <button
-                  onClick={() => {
-                    reverseSortCompany();
-                  }}
-                >
-                  ▲
-                </button>
-              </th>
-              <th>
-                품목코드
-                <button
-                  onClick={() => {
-                    sortProductCode();
-                  }}
-                >
-                  ▼
-                </button>
-                <button
-                  onClick={() => {
-                    reverseSortProductCode();
-                  }}
-                >
-                  ▲
-                </button>
-              </th>
-              <th>
-                품목명
-                <button
-                  onClick={() => {
-                    sortProductName();
-                  }}
-                >
-                  ▼
-                </button>
-                <button
-                  onClick={() => {
-                    reverseSortProductName();
-                  }}
-                >
-                  ▲
-                </button>
-              </th>
-              <th>
-                발주수량
-                <button
-                  onClick={() => {
-                    sortQuantity();
-                  }}
-                >
-                  ▼
-                </button>
-                <button
-                  onClick={() => {
-                    reverseSortQuantity();
-                  }}
-                >
-                  ▲
-                </button>
-              </th>
-              <th>
-                납기일
-                <button
-                  onClick={() => {
-                    sortEndDay();
-                  }}
-                >
-                  ▼
-                </button>
-                <button
-                  onClick={() => {
-                    reverseSortEndDay();
-                  }}
-                >
-                  ▲
-                </button>
-              </th>
-              <th>비고</th>
-              <th className="modifyBtn-border"> </th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.map((elm, idx) => {
-              return (
-                <tr
-                  key={idx}
-                  style={
-                    order[idx].emergency === 1
-                      ? { background: '#ffb49c' }
-                      : { background: 'white' }
-                  }
-                >
-                  <td>
-                    <input
-                      type="checkbox"
-                      name="check"
-                      id="check"
-                      onChange={() => {
-                        changeCheck(idx);
-                        haveAnyChecked();
-                      }}
-                      checked={order[idx].checked}
-                    />
-                  </td>
-                  <td>{order[idx].orderCode}</td>
-                  <td>{order[idx].startDay}</td>
-                  <td>{order[idx].emergency === 1 ? '✔️' : ''}</td>
-                  <td>{order[idx].company}</td>
-                  <td>{order[idx].productCode}</td>
-                  <td>{order[idx].productName}</td>
-                  <td>{order[idx].quantity}</td>
-                  <td>{order[idx].endDay}</td>
-                  <td className="etc">{order[idx].etc}</td>
-                  <td className="modifyBtn-border">
-                    <button
-                      onClick={() => {
-                        modifyProduct(idx);
-                      }}
-                    >
-                      수정
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="main">
+          <table>
+            <thead>
+              <tr>
+                <th>
+                  선택
+                  <input
+                    type="checkbox"
+                    name="allCheck"
+                    id="allCheck"
+                    onChange={() => {
+                      checkAll();
+                    }}
+                    checked={
+                      allChecked === 1 && anyChecked === 1 ? true : false
+                    }
+                  />
+                </th>
+                <th>
+                  발주번호
+                  <button
+                    onClick={() => {
+                      sortOrderCode();
+                    }}
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onClick={() => {
+                      reverseSortOrderCode();
+                    }}
+                  >
+                    ▲
+                  </button>
+                </th>
+                <th>
+                  발주일
+                  <button
+                    onClick={() => {
+                      sortStartDay();
+                    }}
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onClick={() => {
+                      reverseSortStartDay();
+                    }}
+                  >
+                    ▲
+                  </button>
+                </th>
+                <th>
+                  긴급발주
+                  <button
+                    onClick={() => {
+                      sortEmergency();
+                    }}
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onClick={() => {
+                      reverseSortEmergency();
+                    }}
+                  >
+                    ▲
+                  </button>
+                </th>
+                <th>
+                  고객사
+                  <button
+                    onClick={() => {
+                      sortCompany();
+                    }}
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onClick={() => {
+                      reverseSortCompany();
+                    }}
+                  >
+                    ▲
+                  </button>
+                </th>
+                <th>
+                  품목코드
+                  <button
+                    onClick={() => {
+                      sortProductCode();
+                    }}
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onClick={() => {
+                      reverseSortProductCode();
+                    }}
+                  >
+                    ▲
+                  </button>
+                </th>
+                <th>
+                  품목명
+                  <button
+                    onClick={() => {
+                      sortProductName();
+                    }}
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onClick={() => {
+                      reverseSortProductName();
+                    }}
+                  >
+                    ▲
+                  </button>
+                </th>
+                <th>
+                  발주수량
+                  <button
+                    onClick={() => {
+                      sortQuantity();
+                    }}
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onClick={() => {
+                      reverseSortQuantity();
+                    }}
+                  >
+                    ▲
+                  </button>
+                </th>
+                <th>
+                  납기일
+                  <button
+                    onClick={() => {
+                      sortEndDay();
+                    }}
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onClick={() => {
+                      reverseSortEndDay();
+                    }}
+                  >
+                    ▲
+                  </button>
+                </th>
+                <th>비고</th>
+                <th className="emergency-check">긴급</th>
+                <th className="modifyBtn-border"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {order.map((elm, idx) => {
+                return (
+                  <tr
+                    key={idx}
+                    style={
+                      order[idx].emergency === 1
+                        ? { background: '#ffb49c' }
+                        : { background: 'white' }
+                    }
+                  >
+                    <td>
+                      <input
+                        type="checkbox"
+                        name="check"
+                        id="check"
+                        onChange={() => {
+                          changeCheck(idx);
+                          haveAnyChecked();
+                        }}
+                        checked={order[idx].checked}
+                      />
+                    </td>
+                    <td>{order[idx].orderCode}</td>
+                    <td>{order[idx].startDay}</td>
+                    <td>{order[idx].emergency === 1 ? '✔️' : ''}</td>
+                    <td>{order[idx].company}</td>
+                    <td>{order[idx].productCode}</td>
+                    <td>{order[idx].productName}</td>
+                    <td>{order[idx].quantity}</td>
+                    <td>{order[idx].endDay}</td>
+                    <td className="etc">{order[idx].etc}</td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        name="emergencyCheck"
+                        id="emergencyCheck"
+                        onChange={() => {
+                          changeListEmergency(idx);
+                        }}
+                        checked={order[idx].emergency === 1 ? true : false}
+                      />
+                    </td>
+                    <td className="modifyBtn-border">
+                      <button
+                        onClick={() => {
+                          modifyProduct(idx);
+                        }}
+                      >
+                        수정
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
       <div className="tail">
         <div className="inputPart">
           <table>
             <thead>
               <tr>
-                <th>발주번호</th>
+                <th className="orderCodeInput">발주번호</th>
                 <th>발주일</th>
                 <th>긴급</th>
                 <th>고객사</th>
@@ -617,16 +734,8 @@ function App() {
             </thead>
             <tbody>
               <tr>
-                <td>
-                  <input
-                    type="text"
-                    className="text"
-                    placeholder="발주번호를 입력해주세요"
-                    onChange={(e) => {
-                      changeOrderCode(e.target.value);
-                    }}
-                    value={orderCopy.orderCode}
-                  />
+                <td className="orderCodeInput">
+                  <div>{orderCopy.orderCode}</div>
                 </td>
                 <td>
                   <input
