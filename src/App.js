@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './App.css';
+import product from './product';
 
 function App() {
   let nowDate = new Date();
@@ -12,27 +13,35 @@ function App() {
     year: nowYear,
   });
   const preMonth = () => {
-    if (thisMonthYear.month === 1) {
-      let copy = { ...thisMonthYear };
-      copy.month = 12;
-      copy.year -= 1;
-      setThisMonthYear(copy);
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
     } else {
-      let copy = { ...thisMonthYear };
-      copy.month -= 1;
-      setThisMonthYear(copy);
+      if (thisMonthYear.month === 1) {
+        let copy = { ...thisMonthYear };
+        copy.month = 12;
+        copy.year -= 1;
+        setThisMonthYear(copy);
+      } else {
+        let copy = { ...thisMonthYear };
+        copy.month -= 1;
+        setThisMonthYear(copy);
+      }
     }
   };
   const nextMonth = () => {
-    if (thisMonthYear.month === 12) {
-      let copy = { ...thisMonthYear };
-      copy.month = 1;
-      copy.year += 1;
-      setThisMonthYear(copy);
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
     } else {
-      let copy = { ...thisMonthYear };
-      copy.month += 1;
-      setThisMonthYear(copy);
+      if (thisMonthYear.month === 12) {
+        let copy = { ...thisMonthYear };
+        copy.month = 1;
+        copy.year += 1;
+        setThisMonthYear(copy);
+      } else {
+        let copy = { ...thisMonthYear };
+        copy.month += 1;
+        setThisMonthYear(copy);
+      }
     }
   };
   // 주문 목록 state
@@ -178,19 +187,28 @@ function App() {
       setOrderCopy(copy);
     }
   };
-  // 고객사 입력함수
+  // 고객사 입력함수. 안쓰임
   const changeCompany = (value) => {
     let copy = { ...orderCopy };
     copy.company = value;
     setOrderCopy(copy);
   };
-  // 품목코드 입력함수
+  // 품목코드 입력함수. 품목명과 회사명까지
   const changeProductCode = (value) => {
     let copy = { ...orderCopy };
     copy.productCode = value;
+    //product 변수돌면서 같은 품목코드 있는지. 있다면 이름과 회사명을 값에 저장. 다르다면 이름과 회사명 빈값
+    let sameProduct = product.find((elm) => value === elm.productCode);
+    if (sameProduct) {
+      copy.productName = sameProduct.productName;
+      copy.company = sameProduct.company;
+    } else {
+      copy.productName = '';
+      copy.company = '';
+    }
     setOrderCopy(copy);
   };
-  // 품목명 입력함수
+  // 품목명 입력함수. 안쓰임
   const changeProductName = (value) => {
     let copy = { ...orderCopy };
     copy.productName = value;
@@ -217,18 +235,22 @@ function App() {
 
   //삭제버튼 누르면 선택한 항목 삭제하기
   const deleteOrder = () => {
-    if (checked.indexOf(1) === -1) {
-      alert('선택한 항목이 없습니다');
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
     } else {
-      if (window.confirm('선택한 항목을 삭제하시겠습니까?')) {
-        let copy = [...order];
-        // filter 말고 map쓰면 없어진 부분이 undefined로 나옴
-        let copy2 = copy.filter((elm) => {
-          if (elm.checked === 0) {
-            return elm;
-          }
-        });
-        setOrder(copy2);
+      if (checked.indexOf(1) === -1) {
+        alert('선택한 항목이 없습니다');
+      } else {
+        if (window.confirm('선택한 항목을 삭제하시겠습니까?')) {
+          let copy = [...order];
+          // filter 말고 map쓰면 없어진 부분이 undefined로 나옴
+          let copy2 = copy.filter((elm) => {
+            if (elm.checked === 0) {
+              return elm;
+            }
+          });
+          setOrder(copy2);
+        }
       }
     }
   };
@@ -758,15 +780,7 @@ function App() {
                   />
                 </td>
                 <td>
-                  <input
-                    type="text"
-                    className="text"
-                    placeholder="고객사를 입력해주세요"
-                    onChange={(e) => {
-                      changeCompany(e.target.value);
-                    }}
-                    value={orderCopy.company}
-                  />
+                  <div className="companyInput">{orderCopy.company}</div>
                 </td>
                 <td>
                   <input
@@ -780,15 +794,9 @@ function App() {
                   />
                 </td>
                 <td>
-                  <input
-                    type="text"
-                    className="text"
-                    placeholder="품목명을 입력해주세요"
-                    onChange={(e) => {
-                      changeProductName(e.target.value);
-                    }}
-                    value={orderCopy.productName}
-                  />
+                  <div className="productNameInput">
+                    {orderCopy.productName}
+                  </div>
                 </td>
                 <td>
                   <input

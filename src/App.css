@@ -55,14 +55,6 @@ tbody tr .checkbox input {
   margin-top: -6.5px;
   margin-left: -6.5px;
 }
-/* 밑의 발주번호 */
-tbody tr .orderCodeInput {
-  position: relative;
-  min-width: 8vw;
-}
-tbody tr .orderCodeInput div {
-  display: inline-block;
-}
 
 .etc {
   max-width: 300px;
@@ -103,4 +95,22 @@ input[type='text'] {
 .inputPart button {
   width: 5vw;
   height: 5vh;
+}
+/* 밑의 발주번호 */
+tbody tr .orderCodeInput {
+  position: relative;
+  min-width: 8vw;
+}
+tbody tr .orderCodeInput div {
+  display: inline-block;
+}
+/* 밑의 회사명 */
+tbody tr .companyInput {
+  position: relative;
+  min-width: 8vw;
+}
+
+tbody tr .productNameInput {
+  position: relative;
+  min-width: 8vw;
 }
