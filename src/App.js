@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import './App.css';
 import product from './product';
+import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
+import ProductManagement from './생산관리';
 
 function App() {
   let nowDate = new Date();
@@ -485,367 +487,377 @@ function App() {
     }
   };
   return (
-    <div className="App">
-      <div className="scroll">
-        <div className="header">
-          <h1 id="title">
-            <button
-              onClick={() => {
-                preMonth();
-              }}
-            >
-              ◀︎
-            </button>
-            {thisMonthYear.year}년 {thisMonthYear.month}월 발주 관리
-            <button
-              onClick={() => {
-                nextMonth();
-              }}
-            >
-              ▶︎
-            </button>
-          </h1>
-          <div>
-            <button id="saveBtn" type="button">
-              저장하기
-            </button>
-            <button
-              id="deleteBtn"
-              type="button"
-              onClick={() => {
-                deleteOrder();
-              }}
-            >
-              선택삭제
-            </button>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <div className="App">
+            <div className="scroll">
+              <div className="header">
+                <h1 id="title">
+                  <button
+                    onClick={() => {
+                      preMonth();
+                    }}
+                  >
+                    ◀︎
+                  </button>
+                  {thisMonthYear.year}년 {thisMonthYear.month}월 발주 관리
+                  <button
+                    onClick={() => {
+                      nextMonth();
+                    }}
+                  >
+                    ▶︎
+                  </button>
+                </h1>
+                <div>
+                  <button id="saveBtn" type="button">
+                    저장하기
+                  </button>
+                  <button
+                    id="deleteBtn"
+                    type="button"
+                    onClick={() => {
+                      deleteOrder();
+                    }}
+                  >
+                    선택삭제
+                  </button>
+                </div>
+              </div>
+              <div className="main">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>
+                        선택
+                        <input
+                          type="checkbox"
+                          name="allCheck"
+                          id="allCheck"
+                          onChange={() => {
+                            checkAll();
+                          }}
+                          checked={
+                            allChecked === 1 && anyChecked === 1 ? true : false
+                          }
+                        />
+                      </th>
+                      <th>
+                        발주번호
+                        <button
+                          onClick={() => {
+                            sortOrderCode();
+                          }}
+                        >
+                          ▼
+                        </button>
+                        <button
+                          onClick={() => {
+                            reverseSortOrderCode();
+                          }}
+                        >
+                          ▲
+                        </button>
+                      </th>
+                      <th>
+                        발주일
+                        <button
+                          onClick={() => {
+                            sortStartDay();
+                          }}
+                        >
+                          ▼
+                        </button>
+                        <button
+                          onClick={() => {
+                            reverseSortStartDay();
+                          }}
+                        >
+                          ▲
+                        </button>
+                      </th>
+                      <th>
+                        긴급발주
+                        <button
+                          onClick={() => {
+                            sortEmergency();
+                          }}
+                        >
+                          ▼
+                        </button>
+                        <button
+                          onClick={() => {
+                            reverseSortEmergency();
+                          }}
+                        >
+                          ▲
+                        </button>
+                      </th>
+                      <th>
+                        고객사
+                        <button
+                          onClick={() => {
+                            sortCompany();
+                          }}
+                        >
+                          ▼
+                        </button>
+                        <button
+                          onClick={() => {
+                            reverseSortCompany();
+                          }}
+                        >
+                          ▲
+                        </button>
+                      </th>
+                      <th>
+                        품목코드
+                        <button
+                          onClick={() => {
+                            sortProductCode();
+                          }}
+                        >
+                          ▼
+                        </button>
+                        <button
+                          onClick={() => {
+                            reverseSortProductCode();
+                          }}
+                        >
+                          ▲
+                        </button>
+                      </th>
+                      <th>
+                        품목명
+                        <button
+                          onClick={() => {
+                            sortProductName();
+                          }}
+                        >
+                          ▼
+                        </button>
+                        <button
+                          onClick={() => {
+                            reverseSortProductName();
+                          }}
+                        >
+                          ▲
+                        </button>
+                      </th>
+                      <th>
+                        발주수량
+                        <button
+                          onClick={() => {
+                            sortQuantity();
+                          }}
+                        >
+                          ▼
+                        </button>
+                        <button
+                          onClick={() => {
+                            reverseSortQuantity();
+                          }}
+                        >
+                          ▲
+                        </button>
+                      </th>
+                      <th>
+                        납기일
+                        <button
+                          onClick={() => {
+                            sortEndDay();
+                          }}
+                        >
+                          ▼
+                        </button>
+                        <button
+                          onClick={() => {
+                            reverseSortEndDay();
+                          }}
+                        >
+                          ▲
+                        </button>
+                      </th>
+                      <th>비고</th>
+                      <th className="emergency-check">긴급</th>
+                      <th className="modifyBtn-border"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {order.map((elm, idx) => {
+                      return (
+                        <tr
+                          key={idx}
+                          style={
+                            order[idx].emergency === 1
+                              ? { background: '#ffb49c' }
+                              : { background: 'white' }
+                          }
+                        >
+                          <td>
+                            <input
+                              type="checkbox"
+                              name="check"
+                              id="check"
+                              onChange={() => {
+                                changeCheck(idx);
+                                haveAnyChecked();
+                              }}
+                              checked={order[idx].checked}
+                            />
+                          </td>
+                          <td>{order[idx].orderCode}</td>
+                          <td>{order[idx].startDay}</td>
+                          <td>{order[idx].emergency === 1 ? '✔️' : ''}</td>
+                          <td>{order[idx].company}</td>
+                          <td>{order[idx].productCode}</td>
+                          <td>{order[idx].productName}</td>
+                          <td>{order[idx].quantity}</td>
+                          <td>{order[idx].endDay}</td>
+                          <td className="etc">{order[idx].etc}</td>
+                          <td>
+                            <input
+                              type="checkbox"
+                              name="emergencyCheck"
+                              id="emergencyCheck"
+                              onChange={() => {
+                                changeListEmergency(idx);
+                              }}
+                              checked={
+                                order[idx].emergency === 1 ? true : false
+                              }
+                            />
+                          </td>
+                          <td className="modifyBtn-border">
+                            <button
+                              onClick={() => {
+                                modifyProduct(idx);
+                              }}
+                            >
+                              수정
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="tail">
+              <div className="inputPart">
+                <table>
+                  <thead>
+                    <tr>
+                      <th className="orderCodeInput">발주번호</th>
+                      <th>발주일</th>
+                      <th>긴급</th>
+                      <th>고객사</th>
+                      <th>품목코드</th>
+                      <th>품목명</th>
+                      <th>발주수량</th>
+                      <th>납기일</th>
+                      <th>비고</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="orderCodeInput">
+                        <div>{orderCopy.orderCode}</div>
+                      </td>
+                      <td>
+                        <input
+                          type="date"
+                          onChange={(e) => {
+                            changeStartDay(e.target.value);
+                          }}
+                          value={orderCopy.startDay}
+                        />
+                      </td>
+                      <td className="checkbox">
+                        <input
+                          type="checkbox"
+                          name="emergency"
+                          id="emergency"
+                          onChange={() => {
+                            changeEmergency();
+                          }}
+                          checked={orderCopy.emergency}
+                        />
+                      </td>
+                      <td>
+                        <div className="companyInput">{orderCopy.company}</div>
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          className="text"
+                          placeholder="품목코드를 입력해주세요"
+                          onChange={(e) => {
+                            changeProductCode(e.target.value);
+                          }}
+                          value={orderCopy.productCode}
+                        />
+                      </td>
+                      <td>
+                        <div className="productNameInput">
+                          {orderCopy.productName}
+                        </div>
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min={0}
+                          onChange={(e) => {
+                            changeQuantity(e.target.value);
+                          }}
+                          value={orderCopy.quantity}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="date"
+                          onChange={(e) => {
+                            changeEndDay(e.target.value);
+                          }}
+                          value={orderCopy.endDay}
+                        />
+                      </td>
+                      <td>
+                        <textarea
+                          name="etc"
+                          id="etc"
+                          cols="20"
+                          rows="2"
+                          className="text"
+                          onChange={(e) => {
+                            changeEtc(e.target.value);
+                          }}
+                          value={orderCopy.etc}
+                        ></textarea>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                {/* 상황에 따라 추가하기 버튼과 수정하기 버튼으로 바꾸기 */}
+                {addState === -1 ? (
+                  <AddBtn addOrder={addOrder} setOrderCopy={setOrderCopy} />
+                ) : (
+                  <AddModifyBtn
+                    addModify={addModify}
+                    setOrderCopy={setOrderCopy}
+                    addState={addState}
+                  />
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="main">
-          <table>
-            <thead>
-              <tr>
-                <th>
-                  선택
-                  <input
-                    type="checkbox"
-                    name="allCheck"
-                    id="allCheck"
-                    onChange={() => {
-                      checkAll();
-                    }}
-                    checked={
-                      allChecked === 1 && anyChecked === 1 ? true : false
-                    }
-                  />
-                </th>
-                <th>
-                  발주번호
-                  <button
-                    onClick={() => {
-                      sortOrderCode();
-                    }}
-                  >
-                    ▼
-                  </button>
-                  <button
-                    onClick={() => {
-                      reverseSortOrderCode();
-                    }}
-                  >
-                    ▲
-                  </button>
-                </th>
-                <th>
-                  발주일
-                  <button
-                    onClick={() => {
-                      sortStartDay();
-                    }}
-                  >
-                    ▼
-                  </button>
-                  <button
-                    onClick={() => {
-                      reverseSortStartDay();
-                    }}
-                  >
-                    ▲
-                  </button>
-                </th>
-                <th>
-                  긴급발주
-                  <button
-                    onClick={() => {
-                      sortEmergency();
-                    }}
-                  >
-                    ▼
-                  </button>
-                  <button
-                    onClick={() => {
-                      reverseSortEmergency();
-                    }}
-                  >
-                    ▲
-                  </button>
-                </th>
-                <th>
-                  고객사
-                  <button
-                    onClick={() => {
-                      sortCompany();
-                    }}
-                  >
-                    ▼
-                  </button>
-                  <button
-                    onClick={() => {
-                      reverseSortCompany();
-                    }}
-                  >
-                    ▲
-                  </button>
-                </th>
-                <th>
-                  품목코드
-                  <button
-                    onClick={() => {
-                      sortProductCode();
-                    }}
-                  >
-                    ▼
-                  </button>
-                  <button
-                    onClick={() => {
-                      reverseSortProductCode();
-                    }}
-                  >
-                    ▲
-                  </button>
-                </th>
-                <th>
-                  품목명
-                  <button
-                    onClick={() => {
-                      sortProductName();
-                    }}
-                  >
-                    ▼
-                  </button>
-                  <button
-                    onClick={() => {
-                      reverseSortProductName();
-                    }}
-                  >
-                    ▲
-                  </button>
-                </th>
-                <th>
-                  발주수량
-                  <button
-                    onClick={() => {
-                      sortQuantity();
-                    }}
-                  >
-                    ▼
-                  </button>
-                  <button
-                    onClick={() => {
-                      reverseSortQuantity();
-                    }}
-                  >
-                    ▲
-                  </button>
-                </th>
-                <th>
-                  납기일
-                  <button
-                    onClick={() => {
-                      sortEndDay();
-                    }}
-                  >
-                    ▼
-                  </button>
-                  <button
-                    onClick={() => {
-                      reverseSortEndDay();
-                    }}
-                  >
-                    ▲
-                  </button>
-                </th>
-                <th>비고</th>
-                <th className="emergency-check">긴급</th>
-                <th className="modifyBtn-border"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {order.map((elm, idx) => {
-                return (
-                  <tr
-                    key={idx}
-                    style={
-                      order[idx].emergency === 1
-                        ? { background: '#ffb49c' }
-                        : { background: 'white' }
-                    }
-                  >
-                    <td>
-                      <input
-                        type="checkbox"
-                        name="check"
-                        id="check"
-                        onChange={() => {
-                          changeCheck(idx);
-                          haveAnyChecked();
-                        }}
-                        checked={order[idx].checked}
-                      />
-                    </td>
-                    <td>{order[idx].orderCode}</td>
-                    <td>{order[idx].startDay}</td>
-                    <td>{order[idx].emergency === 1 ? '✔️' : ''}</td>
-                    <td>{order[idx].company}</td>
-                    <td>{order[idx].productCode}</td>
-                    <td>{order[idx].productName}</td>
-                    <td>{order[idx].quantity}</td>
-                    <td>{order[idx].endDay}</td>
-                    <td className="etc">{order[idx].etc}</td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        name="emergencyCheck"
-                        id="emergencyCheck"
-                        onChange={() => {
-                          changeListEmergency(idx);
-                        }}
-                        checked={order[idx].emergency === 1 ? true : false}
-                      />
-                    </td>
-                    <td className="modifyBtn-border">
-                      <button
-                        onClick={() => {
-                          modifyProduct(idx);
-                        }}
-                      >
-                        수정
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div className="tail">
-        <div className="inputPart">
-          <table>
-            <thead>
-              <tr>
-                <th className="orderCodeInput">발주번호</th>
-                <th>발주일</th>
-                <th>긴급</th>
-                <th>고객사</th>
-                <th>품목코드</th>
-                <th>품목명</th>
-                <th>발주수량</th>
-                <th>납기일</th>
-                <th>비고</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="orderCodeInput">
-                  <div>{orderCopy.orderCode}</div>
-                </td>
-                <td>
-                  <input
-                    type="date"
-                    onChange={(e) => {
-                      changeStartDay(e.target.value);
-                    }}
-                    value={orderCopy.startDay}
-                  />
-                </td>
-                <td className="checkbox">
-                  <input
-                    type="checkbox"
-                    name="emergency"
-                    id="emergency"
-                    onChange={() => {
-                      changeEmergency();
-                    }}
-                    checked={orderCopy.emergency}
-                  />
-                </td>
-                <td>
-                  <div className="companyInput">{orderCopy.company}</div>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    className="text"
-                    placeholder="품목코드를 입력해주세요"
-                    onChange={(e) => {
-                      changeProductCode(e.target.value);
-                    }}
-                    value={orderCopy.productCode}
-                  />
-                </td>
-                <td>
-                  <div className="productNameInput">
-                    {orderCopy.productName}
-                  </div>
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min={0}
-                    onChange={(e) => {
-                      changeQuantity(e.target.value);
-                    }}
-                    value={orderCopy.quantity}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="date"
-                    onChange={(e) => {
-                      changeEndDay(e.target.value);
-                    }}
-                    value={orderCopy.endDay}
-                  />
-                </td>
-                <td>
-                  <textarea
-                    name="etc"
-                    id="etc"
-                    cols="20"
-                    rows="2"
-                    className="text"
-                    onChange={(e) => {
-                      changeEtc(e.target.value);
-                    }}
-                    value={orderCopy.etc}
-                  ></textarea>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          {/* 상황에 따라 추가하기 버튼과 수정하기 버튼으로 바꾸기 */}
-          {addState === -1 ? (
-            <AddBtn addOrder={addOrder} setOrderCopy={setOrderCopy} />
-          ) : (
-            <AddModifyBtn
-              addModify={addModify}
-              setOrderCopy={setOrderCopy}
-              addState={addState}
-            />
-          )}
-        </div>
-      </div>
-    </div>
+        }
+      ></Route>
+      <Route path="/product생산관리" element={<ProductManagement />}></Route>
+    </Routes>
   );
 }
 
