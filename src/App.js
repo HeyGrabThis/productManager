@@ -1,10 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import product from './product';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import ProductManagement from './생산관리';
+import axios from 'axios';
 
 function App() {
+  let navigate = useNavigate();
+  const changeProductPage = () => {
+    if (window.confirm('저장하지않은 정보는 사라집니다')) {
+      navigate('/product생산관리');
+    }
+  };
+
   let nowDate = new Date();
   let nowYear = nowDate.getFullYear();
   let nowMonth = nowDate.getMonth() + 1;
@@ -61,6 +69,13 @@ function App() {
     quantity: 0,
     endDay: '',
     etc: '',
+    etc2: '',
+    color: '',
+    team: '',
+    orderSheetPublish: 0,
+    orderSheetCollect: 0,
+    report: 0,
+    specialNote: '',
   });
   // 발주 추가하기
   const addOrder = () => {
@@ -120,7 +135,7 @@ function App() {
     haveAnyChecked();
   };
 
-  // 발주일 입력함수. 발주일 입력하면 발주번호 자동으로 입력
+  // 발주일 입력함수. 발주일 입력하면 발주번호 자동으로 입력.납기일자도
   const changeStartDay = (value) => {
     let copy = { ...orderCopy };
     copy.startDay = value;
@@ -189,12 +204,7 @@ function App() {
       setOrderCopy(copy);
     }
   };
-  // 고객사 입력함수. 안쓰임
-  const changeCompany = (value) => {
-    let copy = { ...orderCopy };
-    copy.company = value;
-    setOrderCopy(copy);
-  };
+
   // 품목코드 입력함수. 품목명과 회사명까지
   const changeProductCode = (value) => {
     let copy = { ...orderCopy };
@@ -210,12 +220,7 @@ function App() {
     }
     setOrderCopy(copy);
   };
-  // 품목명 입력함수. 안쓰임
-  const changeProductName = (value) => {
-    let copy = { ...orderCopy };
-    copy.productName = value;
-    setOrderCopy(copy);
-  };
+
   // 개수 입력함수
   const changeQuantity = (value) => {
     let copy = { ...orderCopy };
@@ -486,6 +491,22 @@ function App() {
       setOrder(copy);
     }
   };
+
+  //order리스트를 서버에 보내고 받아오기 위해 발주번호로 정렬한 값을 저장한 state생성
+  let [serverOrder, setServerOrder] = useState();
+  // 페이지가 로드되면 serverOrder에서 order로 옮겨줌
+  useEffect(() => {
+    axios
+      .get('/url')
+      .then((res) => {
+        setServerOrder(res.data);
+        setOrder([...serverOrder]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   return (
     <Routes>
       <Route
@@ -523,6 +544,13 @@ function App() {
                     }}
                   >
                     선택삭제
+                  </button>
+                  <button
+                    onClick={() => {
+                      changeProductPage();
+                    }}
+                  >
+                    생산관리로 이동
                   </button>
                 </div>
               </div>
@@ -879,6 +907,13 @@ const AddBtn = (props) => {
           quantity: 0,
           endDay: '',
           etc: '',
+          etc2: '',
+          color: '',
+          team: '',
+          orderSheetPublish: 0,
+          orderSheetCollect: 0,
+          report: 0,
+          specialNote: '',
         });
       }}
     >
@@ -904,6 +939,13 @@ const AddModifyBtn = (props) => {
           quantity: 0,
           endDay: '',
           etc: '',
+          etc2: '',
+          color: '',
+          team: '',
+          orderSheetPublish: 0,
+          orderSheetCollect: 0,
+          report: 0,
+          specialNote: '',
         });
       }}
     >
