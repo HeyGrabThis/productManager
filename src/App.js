@@ -294,6 +294,9 @@ function App() {
     }
   };
 
+  //수정하는 목록 취소 위해서 잠시 담아둘 state생성
+  let [modifiedList, setModifiedList] = useState();
+
   // 추가하기(-1), 수정완료(수정하는 idx) 버튼 ui 교체 state
   let [addState, setAddState] = useState(-1);
 
@@ -873,11 +876,17 @@ function App() {
                 {addState === -1 ? (
                   <AddBtn addOrder={addOrder} setOrderCopy={setOrderCopy} />
                 ) : (
-                  <AddModifyBtn
-                    addModify={addModify}
-                    setOrderCopy={setOrderCopy}
-                    addState={addState}
-                  />
+                  <>
+                    <CancelBtn
+                      setAddState={setAddState}
+                      setOrderCopy={setOrderCopy}
+                    />
+                    <AddModifyBtn
+                      addModify={addModify}
+                      setOrderCopy={setOrderCopy}
+                      addState={addState}
+                    />
+                  </>
                 )}
               </div>
             </div>
@@ -918,6 +927,38 @@ const AddBtn = (props) => {
       }}
     >
       추가하기
+    </button>
+  );
+};
+
+const CancelBtn = (props) => {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        props.setAddState(-1);
+        props.setOrderCopy({
+          checked: 0,
+          orderCode: '',
+          startDay: '',
+          emergency: 0,
+          company: '',
+          productCode: '',
+          productName: '',
+          quantity: 0,
+          endDay: '',
+          etc: '',
+          etc2: '',
+          color: '',
+          team: '',
+          orderSheetPublish: 0,
+          orderSheetCollect: 0,
+          report: 0,
+          specialNote: '',
+        });
+      }}
+    >
+      취소
     </button>
   );
 };
