@@ -19,8 +19,8 @@ create table product_management (
     special_note varchar(255),
     etc2 varchar(255),
     product_complmplete_yn varchar(1),
-    special_note_yn varchar(1),ete_yn varchar(1),
-    shipment_co
+    shipment_complete_yn varchar(1),
+    special_note_yn varchar(1), 
     PRIMARY KEY(order_code)
 );
 -- 임시 데이터 INSERT
