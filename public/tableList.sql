@@ -1,5 +1,5 @@
 -- 데이터베이스 생성
-CREATE DATABASE mangement default CHARACTER SET UTF8; 
+CREATE DATABASE management default CHARACTER SET UTF8; 
 -- 데이터베이스 이용
 use management;
 -- 테이블 생성
