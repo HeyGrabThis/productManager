@@ -76,6 +76,9 @@ function App() {
     orderSheetCollect: 0,
     report: 0,
     specialNote: '',
+    specialNote_yn: 0,
+    product_complmplete_yn: 0,
+    shipment_complete_yn: 0,
   });
   // 발주 추가하기
   const addOrder = () => {
@@ -495,15 +498,34 @@ function App() {
     }
   };
 
-  //order리스트를 서버에 보내고 받아오기 위해 발주번호로 정렬한 값을 저장한 state생성
-  let [serverOrder, setServerOrder] = useState();
   // 페이지가 로드되면 serverOrder에서 order로 옮겨줌
   useEffect(() => {
     axios
-      .get('/url')
+      .get('http://localhost:3001/api/product')
       .then((res) => {
-        setServerOrder(res.data);
-        setOrder([...serverOrder]);
+        //parsing작업
+        let copy = res.data.map((elm, idx) => {
+          return {
+            orderCode: elm.order_code,
+            startDay: elm.order_start_date,
+            emergency: elm.emergency_yn,
+            productCode: elm.product_code,
+            quantity: elm.product_quantity,
+            endDay: elm.order_end_date,
+            etc: elm.etc1,
+            etc2: elm.etc2,
+            color: elm.color,
+            team: elm.team,
+            orderSheetPublish: elm.ordersheet_publish_yn,
+            orderSheetCollect: elm.ordersheet_collect_yn,
+            report: elm.report_yn,
+            specialNote: elm.special_note,
+            specialNote_yn: elm.special_note_yn,
+            product_complmplete_yn: elm.product_complmplete_yn,
+            shipment_complete_yn: elm.shipment_complete_yn,
+          };
+        });
+        setOrder(copy);
       })
       .catch((err) => {
         console.log(err);
@@ -717,62 +739,64 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {order.map((elm, idx) => {
-                      return (
-                        <tr
-                          key={idx}
-                          style={
-                            order[idx].emergency === 1
-                              ? { background: '#ffb49c' }
-                              : { background: 'white' }
-                          }
-                        >
-                          <td>
-                            <input
-                              type="checkbox"
-                              name="check"
-                              id="check"
-                              onChange={() => {
-                                changeCheck(idx);
-                                haveAnyChecked();
-                              }}
-                              checked={order[idx].checked}
-                            />
-                          </td>
-                          <td>{order[idx].orderCode}</td>
-                          <td>{order[idx].startDay}</td>
-                          <td>{order[idx].emergency === 1 ? '✔️' : ''}</td>
-                          <td>{order[idx].company}</td>
-                          <td>{order[idx].productCode}</td>
-                          <td>{order[idx].productName}</td>
-                          <td>{order[idx].quantity}</td>
-                          <td>{order[idx].endDay}</td>
-                          <td className="etc">{order[idx].etc}</td>
-                          <td>
-                            <input
-                              type="checkbox"
-                              name="emergencyCheck"
-                              id="emergencyCheck"
-                              onChange={() => {
-                                changeListEmergency(idx);
-                              }}
-                              checked={
-                                order[idx].emergency === 1 ? true : false
+                    {order
+                      ? order.map((elm, idx) => {
+                          return (
+                            <tr
+                              key={idx}
+                              style={
+                                order[idx].emergency === 1
+                                  ? { background: '#ffb49c' }
+                                  : { background: 'white' }
                               }
-                            />
-                          </td>
-                          <td className="modifyBtn-border">
-                            <button
-                              onClick={() => {
-                                modifyProduct(idx);
-                              }}
                             >
-                              수정
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                              <td>
+                                <input
+                                  type="checkbox"
+                                  name="check"
+                                  id="check"
+                                  onChange={() => {
+                                    changeCheck(idx);
+                                    haveAnyChecked();
+                                  }}
+                                  checked={order[idx].checked}
+                                />
+                              </td>
+                              <td>{order[idx].orderCode}</td>
+                              <td>{order[idx].startDay}</td>
+                              <td>{order[idx].emergency === 1 ? '✔️' : ''}</td>
+                              <td>{order[idx].company}</td>
+                              <td>{order[idx].productCode}</td>
+                              <td>{order[idx].productName}</td>
+                              <td>{order[idx].quantity}</td>
+                              <td>{order[idx].endDay}</td>
+                              <td className="etc">{order[idx].etc}</td>
+                              <td>
+                                <input
+                                  type="checkbox"
+                                  name="emergencyCheck"
+                                  id="emergencyCheck"
+                                  onChange={() => {
+                                    changeListEmergency(idx);
+                                  }}
+                                  checked={
+                                    order[idx].emergency === 1 ? true : false
+                                  }
+                                />
+                              </td>
+                              <td className="modifyBtn-border">
+                                <button
+                                  onClick={() => {
+                                    modifyProduct(idx);
+                                  }}
+                                >
+                                  수정
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      : null}
                   </tbody>
                 </table>
               </div>
@@ -923,6 +947,9 @@ const AddBtn = (props) => {
           orderSheetCollect: 0,
           report: 0,
           specialNote: '',
+          specialNote_yn: 0,
+          product_complmplete_yn: 0,
+          shipment_complete_yn: 0,
         });
       }}
     >
@@ -955,6 +982,9 @@ const CancelBtn = (props) => {
           orderSheetCollect: 0,
           report: 0,
           specialNote: '',
+          specialNote_yn: 0,
+          product_complmplete_yn: 0,
+          shipment_complete_yn: 0,
         });
       }}
     >
@@ -987,6 +1017,9 @@ const AddModifyBtn = (props) => {
           orderSheetCollect: 0,
           report: 0,
           specialNote: '',
+          specialNote_yn: 0,
+          product_complmplete_yn: 0,
+          shipment_complete_yn: 0,
         });
       }}
     >

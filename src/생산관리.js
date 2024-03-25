@@ -136,6 +136,9 @@ const ProductManagement = (props) => {
       orderSheetCollect: 0,
       report: 0,
       specialNote: '',
+      specialNote_yn: 0,
+      product_complmplete_yn: 0,
+      shipment_complete_yn: 0,
     },
     {
       // 예시용
@@ -156,6 +159,9 @@ const ProductManagement = (props) => {
       orderSheetCollect: 0,
       report: 0,
       specialNote: '',
+      specialNote_yn: 0,
+      product_complmplete_yn: 0,
+      shipment_complete_yn: 0,
     },
   ]);
 
