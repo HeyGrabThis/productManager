@@ -498,13 +498,18 @@ function App() {
     }
   };
 
-  // 페이지가 로드되면 serverOrder에서 order로 옮겨줌
+  // 페이지가 로드되면 서버에서 order로 옮겨줌
   useEffect(() => {
     axios
       .get('http://localhost:3001/api/product')
       .then((res) => {
         //parsing작업
         let copy = res.data.map((elm, idx) => {
+          //품목코드 조회해서 품목명과 회사 저장
+          let product_codeValue = elm.product_code;
+          let sameProduct = product.find(
+            (elm) => product_codeValue === elm.productCode
+          );
           return {
             orderCode: elm.order_code,
             startDay: elm.order_start_date,
@@ -523,6 +528,9 @@ function App() {
             specialNote_yn: elm.special_note_yn,
             product_complmplete_yn: elm.product_complmplete_yn,
             shipment_complete_yn: elm.shipment_complete_yn,
+            //품목명과 회사 parsing
+            productName: sameProduct.productName,
+            company: sameProduct.company,
           };
         });
         setOrder(copy);
