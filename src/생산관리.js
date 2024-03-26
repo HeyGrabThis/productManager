@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import './App.css';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
+import product from './product';
+import axios from 'axios';
 
 const ProductManagement = (props) => {
   let navigate = useNavigate();
@@ -116,54 +118,49 @@ const ProductManagement = (props) => {
   };
 
   // 나중에 order 서버에서 받아와서 order2 생성
-  let [order2, setOrder2] = useState([
-    {
-      // 예시용
-      checked: 0,
-      orderCode: '240321-01',
-      startDay: '2024-03-21',
-      emergency: 1,
-      company: '성원코리아',
-      productCode: 'V1234',
-      productName: '제트기',
-      quantity: 123,
-      endDay: '2024-03-30',
-      etc: '',
-      etc2: '',
-      color: '',
-      team: '',
-      orderSheetPublish: 0,
-      orderSheetCollect: 0,
-      report: 0,
-      specialNote: '',
-      specialNote_yn: 0,
-      product_complmplete_yn: 0,
-      shipment_complete_yn: 0,
-    },
-    {
-      // 예시용
-      checked: 0,
-      orderCode: '240321-02',
-      startDay: '2024-03-21',
-      emergency: 0,
-      company: '성원코리아',
-      productCode: 'V1234',
-      productName: '제트기',
-      quantity: 1234,
-      endDay: '2024-03-30',
-      etc: '',
-      etc2: '',
-      color: '',
-      team: '',
-      orderSheetPublish: 0,
-      orderSheetCollect: 0,
-      report: 0,
-      specialNote: '',
-      specialNote_yn: 0,
-      product_complmplete_yn: 0,
-      shipment_complete_yn: 0,
-    },
-  ]);
+  let [order2, setOrder2] = useState([]);
+
+  //서버에서 데이터 받아오기
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/api/product')
+      .then((res) => {
+        //parsing작업
+        let copy = res.data.map((elm, idx) => {
+          //품목코드 조회해서 품목명과 회사 저장
+          let product_codeValue = elm.product_code;
+          let sameProduct = product.find(
+            (elm) => product_codeValue === elm.productCode
+          );
+          return {
+            orderCode: elm.order_code,
+            startDay: elm.order_start_date,
+            emergency: elm.emergency_yn,
+            productCode: elm.product_code,
+            quantity: elm.product_quantity,
+            endDay: elm.order_end_date,
+            etc: elm.etc1,
+            etc2: elm.etc2,
+            color: elm.color,
+            team: elm.team,
+            orderSheetPublish: elm.ordersheet_publish_yn,
+            orderSheetCollect: elm.ordersheet_collect_yn,
+            report: elm.report_yn,
+            specialNote: elm.special_note,
+            specialNote_yn: elm.special_note_yn,
+            product_complmplete_yn: elm.product_complmplete_yn,
+            shipment_complete_yn: elm.shipment_complete_yn,
+            //품목명과 회사 parsing
+            productName: sameProduct.productName,
+            company: sameProduct.company,
+          };
+        });
+        setOrder2(copy);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   return (
     <div>
@@ -220,103 +217,105 @@ const ProductManagement = (props) => {
             </tr>
           </thead>
           <tbody className="product-list">
-            {order2.map((elm, idx) => {
-              return (
-                <tr
-                  key={idx}
-                  style={
-                    order2[idx].emergency === 1
-                      ? { background: '#ffb49c' }
-                      : { background: 'white' }
-                  }
-                >
-                  <td>{idx + 1}</td>
-                  <td>{elm.orderCode}</td>
-                  <td>{elm.emergency === 1 ? '✔️' : ''}</td>
-                  <td>{elm.company}</td>
-                  <td>{elm.productCode}</td>
-                  <td>{elm.productName}</td>
-                  <td>{elm.quantity}</td>
-                  <td>
-                    <Dropdown
-                      options={colorOptions}
-                      onChange={(e) => {
-                        changeColor(e.value, idx);
-                      }}
-                      value={'선택'}
-                    />
-                  </td>
-                  <td>{elm.startDay}</td>
-                  <td>{elm.endDay}</td>
-                  <td>
-                    <Dropdown
-                      options={teamOptions}
-                      onChange={(e) => {
-                        changeTeam(e.value, idx);
-                      }}
-                      value={'선택'}
-                    />
-                  </td>
-                  <td>
-                    발행완료
-                    <input
-                      type="checkbox"
-                      name="orderSheetPublish"
-                      id="orderSheetPublish"
-                      onChange={() => {
-                        changeSheetPublish(idx);
-                      }}
-                      checked={elm.orderSheetPublish === 1 ? true : false}
-                    />
-                  </td>
-                  <td>
-                    회수완료
-                    <input
-                      type="checkbox"
-                      name="orderSheetCollect"
-                      id="orderSheetCollect"
-                      onChange={() => {
-                        changeSheetCollect(idx);
-                      }}
-                      checked={elm.orderSheetCollect === 1 ? true : false}
-                    />
-                  </td>
-                  <td>
-                    발행완료
-                    <input
-                      type="checkbox"
-                      name="report"
-                      id="report"
-                      onChange={() => {
-                        changeReport(idx);
-                      }}
-                      checked={elm.report === 1 ? true : false}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      onChange={(e) => {
-                        changeSpecialNote(e.target.value, idx);
-                      }}
-                      value={elm.specialNote}
-                    />
-                  </td>
-                  <td>
-                    <textarea
-                      name="etc2"
-                      id="etc2"
-                      cols="20"
-                      rows="2"
-                      onChange={(e) => {
-                        changeEtc2(e.target.value, idx);
-                      }}
-                      value={elm.etc2}
-                    ></textarea>
-                  </td>
-                </tr>
-              );
-            })}
+            {order2
+              ? order2.map((elm, idx) => {
+                  return (
+                    <tr
+                      key={idx}
+                      style={
+                        order2[idx].emergency === 1
+                          ? { background: '#ffb49c' }
+                          : { background: 'white' }
+                      }
+                    >
+                      <td>{idx + 1}</td>
+                      <td>{elm.orderCode}</td>
+                      <td>{elm.emergency === 1 ? '✔️' : ''}</td>
+                      <td>{elm.company}</td>
+                      <td>{elm.productCode}</td>
+                      <td>{elm.productName}</td>
+                      <td>{elm.quantity}</td>
+                      <td>
+                        <Dropdown
+                          options={colorOptions}
+                          onChange={(e) => {
+                            changeColor(e.value, idx);
+                          }}
+                          value={'선택'}
+                        />
+                      </td>
+                      <td>{elm.startDay}</td>
+                      <td>{elm.endDay}</td>
+                      <td>
+                        <Dropdown
+                          options={teamOptions}
+                          onChange={(e) => {
+                            changeTeam(e.value, idx);
+                          }}
+                          value={'선택'}
+                        />
+                      </td>
+                      <td>
+                        발행완료
+                        <input
+                          type="checkbox"
+                          name="orderSheetPublish"
+                          id="orderSheetPublish"
+                          onChange={() => {
+                            changeSheetPublish(idx);
+                          }}
+                          checked={elm.orderSheetPublish === 1 ? true : false}
+                        />
+                      </td>
+                      <td>
+                        회수완료
+                        <input
+                          type="checkbox"
+                          name="orderSheetCollect"
+                          id="orderSheetCollect"
+                          onChange={() => {
+                            changeSheetCollect(idx);
+                          }}
+                          checked={elm.orderSheetCollect === 1 ? true : false}
+                        />
+                      </td>
+                      <td>
+                        발행완료
+                        <input
+                          type="checkbox"
+                          name="report"
+                          id="report"
+                          onChange={() => {
+                            changeReport(idx);
+                          }}
+                          checked={elm.report === 1 ? true : false}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          onChange={(e) => {
+                            changeSpecialNote(e.target.value, idx);
+                          }}
+                          value={elm.specialNote}
+                        />
+                      </td>
+                      <td>
+                        <textarea
+                          name="etc2"
+                          id="etc2"
+                          cols="20"
+                          rows="2"
+                          onChange={(e) => {
+                            changeEtc2(e.target.value, idx);
+                          }}
+                          value={elm.etc2}
+                        ></textarea>
+                      </td>
+                    </tr>
+                  );
+                })
+              : null}
           </tbody>
         </table>
       </div>
