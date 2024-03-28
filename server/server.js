@@ -5,6 +5,7 @@ const app = express();
 const PORT = 3001;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.listen(PORT, () => {
   console.log(`Server On : http://localhost:${PORT}/`);
@@ -69,6 +70,16 @@ app.post('/api/product/insert', (req, res) => {
   });
 });
 
-// emergency_yn, etc1, etc2, order_code, order_end_date, order_start_date, ordersheet_collect_yn, ordersheet_publish_yn, product_code, product_complmplete_yn, product_quantity, product_team, report_yn, shipment_complete_yn, special_note, special_note_yn
+// order_id로 서버에 있는 리스트 삭제하기
+app.delete('/api/product/del/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q = 'DELETE FROM product_management WHERE order_id = ?';
 
-app.use(express.urlencoded({ extended: true }));
+  db.query(q, [orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});

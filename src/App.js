@@ -80,11 +80,34 @@ function App() {
     product_complmplete_yn: 0,
     shipment_complete_yn: 0,
   });
-  // 발주 추가하기
-  const addOrder = () => {
+  // 발주 추가하기. 바로 서버에 추가
+  const addOrder = async () => {
     let copy = [...order];
     copy.push(orderCopy);
     setOrder(copy);
+    try {
+      await axios.post('http://localhost:3001/api/product/insert', {
+        color: null,
+        emergency_yn: orderCopy.emergency,
+        etc1: orderCopy.etc,
+        etc2: null,
+        order_code: orderCopy.orderCode,
+        order_end_date: orderCopy.endDay,
+        order_start_date: orderCopy.startDay,
+        ordersheet_collect_yn: null,
+        ordersheet_publish_yn: null,
+        product_code: orderCopy.productCode,
+        product_complmplete_yn: null,
+        product_quantity: orderCopy.quantity,
+        product_team: null,
+        report_yn: null,
+        shipment_complete_yn: null,
+        special_note: null,
+        special_note_yn: null,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   //checked만 따로 모아둔 배열 생성
@@ -243,7 +266,7 @@ function App() {
     setOrderCopy(copy);
   };
 
-  //삭제버튼 누르면 선택한 항목 삭제하기
+  //삭제버튼 누르면 선택한 항목 삭제하기. 서버에 있는 항목도 id로 삭제하기
   const deleteOrder = () => {
     if (addState !== -1) {
       alert('수정을 완료해주세요');
@@ -260,6 +283,22 @@ function App() {
             }
           });
           setOrder(copy2);
+          //체크된 것들 아이디 반환
+          let copy3 = copy.filter((elm) => {
+            if (elm.checked === 1) {
+              return elm;
+            }
+          });
+          console.log(copy3);
+          copy3.map(async (elm) => {
+            try {
+              await axios.delete(
+                'http://localhost:3001/api/product/del/' + elm.orderId
+              );
+            } catch (err) {
+              console.log(err);
+            }
+          });
         }
       }
     }
@@ -296,9 +335,6 @@ function App() {
       }
     }
   };
-
-  //수정하는 목록 취소 위해서 잠시 담아둘 state생성
-  let [modifiedList, setModifiedList] = useState();
 
   // 추가하기(-1), 수정완료(수정하는 idx) 버튼 ui 교체 state
   let [addState, setAddState] = useState(-1);
@@ -501,40 +537,73 @@ function App() {
   // 페이지가 로드되면 서버에서 order로 옮겨줌. 무슨 년도,달에 위치해있는지 확인하고 그에 맞는 데이터 가져오기
   useEffect(() => {
     let thisMonthYearCopy =
-      `${thisMonthYear.year}` + String(thisMonthYear.month).padStart(2, '0');
+      `${thisMonthYear.year}`.slice(-2) +
+      String(thisMonthYear.month).padStart(2, '0');
     axios
       .get('http://localhost:3001/api/product/' + thisMonthYearCopy)
       .then((res) => {
         console.log(res.data);
         //parsing작업
         let copy = res.data.map((elm, idx) => {
-          //품목코드 조회해서 품목명과 회사 저장
-          let product_codeValue = elm.product_code;
-          let sameProduct = product.find(
-            (elm) => product_codeValue === elm.productCode
-          );
-          return {
-            orderCode: elm.order_code,
-            startDay: elm.order_start_date,
-            emergency: Number(elm.emergency_yn),
-            productCode: elm.product_code,
-            quantity: elm.product_quantity,
-            endDay: elm.order_end_date,
-            etc: elm.etc1,
-            etc2: elm.etc2,
-            color: elm.color,
-            team: elm.team,
-            orderSheetPublish: Number(elm.ordersheet_publish_yn),
-            orderSheetCollect: Number(elm.ordersheet_collect_yn),
-            report: Number(elm.report_yn),
-            specialNote: elm.special_note,
-            specialNote_yn: Number(elm.special_note_yn),
-            product_complmplete_yn: Number(elm.product_complmplete_yn),
-            shipment_complete_yn: Number(elm.shipment_complete_yn),
-            //품목명과 회사 parsing
-            productName: sameProduct.productName,
-            company: sameProduct.company,
-          };
+          //품목코드 조회해서 품목명과 회사 저장(품목코드 있으면)
+          if (elm.product_code) {
+            let product_codeValue = elm.product_code;
+            let sameProduct = product.find(
+              (elm) => product_codeValue === elm.productCode
+            );
+            return {
+              checked: 0,
+              orderCode: elm.order_code,
+              startDay: elm.order_start_date,
+              emergency: Number(elm.emergency_yn),
+              productCode: elm.product_code,
+              quantity: elm.product_quantity,
+              endDay: elm.order_end_date,
+              etc: elm.etc1,
+              etc2: elm.etc2,
+              color: elm.color,
+              team: elm.team,
+              orderSheetPublish: Number(elm.ordersheet_publish_yn),
+              orderSheetCollect: Number(elm.ordersheet_collect_yn),
+              report: Number(elm.report_yn),
+              specialNote: elm.special_note,
+              specialNote_yn: Number(elm.special_note_yn),
+              product_complmplete_yn: Number(elm.product_complmplete_yn),
+              shipment_complete_yn: Number(elm.shipment_complete_yn),
+              //품목명과 회사 parsing
+              productName: sameProduct.productName,
+              company: sameProduct.company,
+              //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
+              orderId: elm.order_id,
+            };
+          } else {
+            //품목코드 없으면
+            return {
+              checked: 0,
+              orderCode: elm.order_code,
+              startDay: elm.order_start_date,
+              emergency: Number(elm.emergency_yn),
+              productCode: elm.product_code,
+              quantity: elm.product_quantity,
+              endDay: elm.order_end_date,
+              etc: elm.etc1,
+              etc2: elm.etc2,
+              color: elm.color,
+              team: elm.team,
+              orderSheetPublish: Number(elm.ordersheet_publish_yn),
+              orderSheetCollect: Number(elm.ordersheet_collect_yn),
+              report: Number(elm.report_yn),
+              specialNote: elm.special_note,
+              specialNote_yn: Number(elm.special_note_yn),
+              product_complmplete_yn: Number(elm.product_complmplete_yn),
+              shipment_complete_yn: Number(elm.shipment_complete_yn),
+              //품목명과 회사 parsing
+              productName: '',
+              company: '',
+              //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
+              orderId: elm.order_id,
+            };
+          }
         });
         setOrder(copy);
       })
@@ -543,8 +612,8 @@ function App() {
       });
   }, [thisMonthYear]);
 
-  // 서버로 값 추가하기
-  // order state에서 orderCode가 서버와 다른 것이 있는지 보고 다르다면 db에서 삭제 후 db에 없는 목록은 생성, 같다면 수정
+  // 서버로 post, update
+  // 프론트의 order state에서 id가 있다면(서버에서 받아온 데이터라는 뜻) 수정하기. order state에 id가 없다면(새로 추가된 것) 추가하기.
   const saveOrder = async () => {
     try {
       await axios.post('http://localhost:3001/api/product/insert', {
@@ -597,15 +666,6 @@ function App() {
                   </button>
                 </h1>
                 <div>
-                  <button
-                    id="saveBtn"
-                    type="button"
-                    onClick={() => {
-                      saveOrder();
-                    }}
-                  >
-                    저장하기
-                  </button>
                   <button
                     id="deleteBtn"
                     type="button"

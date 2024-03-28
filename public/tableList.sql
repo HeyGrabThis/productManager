@@ -21,17 +21,18 @@ create table product_management (
     product_complmplete_yn varchar(1),
     shipment_complete_yn varchar(1),
     special_note_yn varchar(1), 
-    PRIMARY KEY(order_code)
+    order_id int NOT NULL,
+    PRIMARY KEY(order_code,order_id)
 );
 -- 임시 데이터 INSERT
 INSERT INTO product_management (order_code, order_start_date, emergency_yn, product_code, product_quantity, order_end_date, etc1)
-VALUES ('20240323-01', '2024-03-23', '1', 'V1234', 3, '2024-04-01', 'test1');
+VALUES ('240323-01', '2024-03-23', '1', 'V1234', 3, '2024-04-01', 'test1');
 
 INSERT INTO product_management (order_code, order_start_date, emergency_yn, product_code, product_quantity, order_end_date, etc1)
-VALUES ('20240323-02', '2024-03-23', '0', 'V1234', 5, '2024-04-01', 'test2');
+VALUES ('240323-02', '2024-03-23', '0', 'V1234', 5, '2024-04-01', 'test2');
 
 INSERT INTO product_management (order_code, order_start_date, emergency_yn, product_code, product_quantity, order_end_date, etc1)
-VALUES ('20240423-01', '2024-03-23', '1', 'V1234', 3, '2024-05-01', 'test3');
+VALUES ('240423-01', '2024-03-23', '1', 'V1234', 3, '2024-05-01', 'test3');
 
 -- 데이터 조회 SELECT
 select * from product_management;
