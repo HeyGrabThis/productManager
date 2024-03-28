@@ -18,10 +18,14 @@ app.use(
   })
 );
 
-app.get('/api/product', (req, res) => {
+//년도와 달 파라미터로 받아와서 get하기
+app.get('/api/product/:id', (req, res) => {
   res.header('Access-Control-Allow-Origin', '*');
+  const q = `SELECT * FROM product_management WHERE order_code LIKE '?%'`;
 
-  db.query('select * from product_management', (err, data) => {
+  const thisMonthYear = Number(req.params.id);
+
+  db.query(q, [thisMonthYear], (err, data) => {
     if (!err) {
       res.send(data);
     } else {
@@ -30,3 +34,41 @@ app.get('/api/product', (req, res) => {
     }
   });
 });
+
+// insert
+app.post('/api/product/insert', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+
+  const sqlQuery =
+    'INSERT INTO product_management(`color`, `emergency_yn`, `etc1`, `etc2`, `order_code`, `order_end_date`, `order_start_date`, `ordersheet_collect_yn`, `ordersheet_publish_yn`, `product_code`, `product_complmplete_yn`, `product_quantity`, `product_team`, `report_yn`, `shipment_complete_yn`, `special_note`, `special_note_yn`) VALUES(?)';
+  const values = [
+    req.body.color,
+    req.body.emergency_yn,
+    req.body.etc1,
+    req.body.etc2,
+    req.body.order_code,
+    req.body.order_end_date,
+    req.body.order_start_date,
+    req.body.ordersheet_collect_yn,
+    req.body.ordersheet_publish_yn,
+    req.body.product_code,
+    req.body.product_complmplete_yn,
+    req.body.product_quantity,
+    req.body.product_team,
+    req.body.report_yn,
+    req.body.shipment_complete_yn,
+    req.body.special_note,
+    req.body.special_note_yn,
+  ];
+  db.query(sqlQuery, [values], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      res.json('success');
+    }
+  });
+});
+
+// emergency_yn, etc1, etc2, order_code, order_end_date, order_start_date, ordersheet_collect_yn, ordersheet_publish_yn, product_code, product_complmplete_yn, product_quantity, product_team, report_yn, shipment_complete_yn, special_note, special_note_yn
+
+app.use(express.urlencoded({ extended: true }));

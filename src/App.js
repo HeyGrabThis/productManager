@@ -498,11 +498,14 @@ function App() {
     }
   };
 
-  // 페이지가 로드되면 서버에서 order로 옮겨줌
+  // 페이지가 로드되면 서버에서 order로 옮겨줌. 무슨 년도,달에 위치해있는지 확인하고 그에 맞는 데이터 가져오기
   useEffect(() => {
+    let thisMonthYearCopy =
+      `${thisMonthYear.year}` + String(thisMonthYear.month).padStart(2, '0');
     axios
-      .get('http://localhost:3001/api/product')
+      .get('http://localhost:3001/api/product/' + thisMonthYearCopy)
       .then((res) => {
+        console.log(res.data);
         //parsing작업
         let copy = res.data.map((elm, idx) => {
           //품목코드 조회해서 품목명과 회사 저장
@@ -513,7 +516,7 @@ function App() {
           return {
             orderCode: elm.order_code,
             startDay: elm.order_start_date,
-            emergency: elm.emergency_yn,
+            emergency: Number(elm.emergency_yn),
             productCode: elm.product_code,
             quantity: elm.product_quantity,
             endDay: elm.order_end_date,
@@ -521,13 +524,13 @@ function App() {
             etc2: elm.etc2,
             color: elm.color,
             team: elm.team,
-            orderSheetPublish: elm.ordersheet_publish_yn,
-            orderSheetCollect: elm.ordersheet_collect_yn,
-            report: elm.report_yn,
+            orderSheetPublish: Number(elm.ordersheet_publish_yn),
+            orderSheetCollect: Number(elm.ordersheet_collect_yn),
+            report: Number(elm.report_yn),
             specialNote: elm.special_note,
-            specialNote_yn: elm.special_note_yn,
-            product_complmplete_yn: elm.product_complmplete_yn,
-            shipment_complete_yn: elm.shipment_complete_yn,
+            specialNote_yn: Number(elm.special_note_yn),
+            product_complmplete_yn: Number(elm.product_complmplete_yn),
+            shipment_complete_yn: Number(elm.shipment_complete_yn),
             //품목명과 회사 parsing
             productName: sameProduct.productName,
             company: sameProduct.company,
@@ -538,7 +541,35 @@ function App() {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [thisMonthYear]);
+
+  // 서버로 값 추가하기
+  // order state에서 orderCode가 서버와 다른 것이 있는지 보고 다르다면 db에서 삭제 후 db에 없는 목록은 생성, 같다면 수정
+  const saveOrder = async () => {
+    try {
+      await axios.post('http://localhost:3001/api/product/insert', {
+        color: null,
+        emergency_yn: null,
+        etc1: null,
+        etc2: null,
+        order_code: '20240101-02',
+        order_end_date: null,
+        order_start_date: null,
+        ordersheet_collect_yn: null,
+        ordersheet_publish_yn: null,
+        product_code: 'AA1231',
+        product_complmplete_yn: null,
+        product_quantity: null,
+        product_team: null,
+        report_yn: null,
+        shipment_complete_yn: null,
+        special_note: null,
+        special_note_yn: null,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <Routes>
@@ -566,7 +597,13 @@ function App() {
                   </button>
                 </h1>
                 <div>
-                  <button id="saveBtn" type="button">
+                  <button
+                    id="saveBtn"
+                    type="button"
+                    onClick={() => {
+                      saveOrder();
+                    }}
+                  >
                     저장하기
                   </button>
                   <button
@@ -926,6 +963,9 @@ function App() {
         }
       ></Route>
       <Route path="/product생산관리" element={<ProductManagement />}></Route>
+      <Route path="/team1"></Route>
+      <Route path="/team2"></Route>
+      <Route path="/team3"></Route>
     </Routes>
   );
 }
