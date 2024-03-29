@@ -83,3 +83,26 @@ app.delete('/api/product/del/:id', (req, res) => {
     }
   });
 });
+
+// 수정하기(발주관리에서)
+app.put('/api/product/update/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q =
+    'UPDATE product_management SET `emergency_yn` = ?, `etc1` = ?, `order_code` = ?, `order_end_date` = ?, `order_start_date` = ?, `product_code` = ?, `product_quantity` = ? WHERE order_id = ?';
+  const values = [
+    req.body.emergency_yn,
+    req.body.etc1,
+    req.body.order_code,
+    req.body.order_end_date,
+    req.body.order_start_date,
+    req.body.product_code,
+    req.body.product_quantity,
+  ];
+  db.query(q, [...values, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});

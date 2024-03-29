@@ -83,8 +83,15 @@ function App() {
   // 발주 추가하기. 바로 서버에 추가
   const addOrder = async () => {
     let copy = [...order];
-    copy.push(orderCopy);
-    setOrder(copy);
+    // 그 달에 해당하는 데이터인지 판단해서 프론트에 보이는 것 조절
+    let thisMonthYearCopy =
+      `${thisMonthYear.year}`.slice(-2) +
+      String(thisMonthYear.month).padStart(2, '0');
+    // orderCode가 날짜와 같으면 화면에 보이게
+    if (thisMonthYearCopy === orderCopy.orderCode.slice(0, 4)) {
+      copy.push(orderCopy);
+      setOrder(copy);
+    }
     try {
       await axios.post('http://localhost:3001/api/product/insert', {
         color: null,
@@ -339,13 +346,38 @@ function App() {
   // 추가하기(-1), 수정완료(수정하는 idx) 버튼 ui 교체 state
   let [addState, setAddState] = useState(-1);
 
-  // 수정완료한 값들 다시 원래 배열에 넣기
-  const addModify = (idx) => {
+  // 수정완료한 값들 다시 원래 배열에 넣기. 서버에도 적용
+  const addModify = async (idx) => {
     let copy = [...order];
-    copy[idx] = orderCopy;
-    setOrder(copy);
+    // 그 달에 해당하는 데이터인지 판단해서 프론트에 보이는 것 조절
+    let thisMonthYearCopy =
+      `${thisMonthYear.year}`.slice(-2) +
+      String(thisMonthYear.month).padStart(2, '0');
+    // orderCode가 날짜와 같으면 화면에 보이게
+    if (thisMonthYearCopy === orderCopy.orderCode.slice(0, 4)) {
+      copy[idx] = orderCopy;
+      setOrder(copy);
+    }
     // 버튼 '추가하기'로 바꿔야하고 ui state 수정
     setAddState(-1);
+    console.log(orderCopy);
+    // 서버 update
+    try {
+      await axios.put(
+        'http://localhost:3001/api/product/update/' + orderCopy.orderId,
+        {
+          emergency_yn: orderCopy.emergency,
+          etc1: orderCopy.etc,
+          order_code: orderCopy.orderCode,
+          order_end_date: orderCopy.endDay,
+          order_start_date: orderCopy.startDay,
+          product_code: orderCopy.productCode,
+          product_quantity: orderCopy.quantity,
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   // 발주번호 정렬
@@ -539,10 +571,10 @@ function App() {
     let thisMonthYearCopy =
       `${thisMonthYear.year}`.slice(-2) +
       String(thisMonthYear.month).padStart(2, '0');
+
     axios
       .get('http://localhost:3001/api/product/' + thisMonthYearCopy)
       .then((res) => {
-        console.log(res.data);
         //parsing작업
         let copy = res.data.map((elm, idx) => {
           //품목코드 조회해서 품목명과 회사 저장(품목코드 있으면)
@@ -611,34 +643,6 @@ function App() {
         console.log(err);
       });
   }, [thisMonthYear]);
-
-  // 서버로 post, update
-  // 프론트의 order state에서 id가 있다면(서버에서 받아온 데이터라는 뜻) 수정하기. order state에 id가 없다면(새로 추가된 것) 추가하기.
-  const saveOrder = async () => {
-    try {
-      await axios.post('http://localhost:3001/api/product/insert', {
-        color: null,
-        emergency_yn: null,
-        etc1: null,
-        etc2: null,
-        order_code: '20240101-02',
-        order_end_date: null,
-        order_start_date: null,
-        ordersheet_collect_yn: null,
-        ordersheet_publish_yn: null,
-        product_code: 'AA1231',
-        product_complmplete_yn: null,
-        product_quantity: null,
-        product_team: null,
-        report_yn: null,
-        shipment_complete_yn: null,
-        special_note: null,
-        special_note_yn: null,
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   return (
     <Routes>
