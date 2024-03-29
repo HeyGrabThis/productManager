@@ -87,7 +87,7 @@ function App() {
     let thisMonthYearCopy =
       `${thisMonthYear.year}`.slice(-2) +
       String(thisMonthYear.month).padStart(2, '0');
-    // orderCode가 날짜와 같으면 화면에 보이게
+    // orderCode가 날짜와 같을 때만 화면에 보이게
     if (thisMonthYearCopy === orderCopy.orderCode.slice(0, 4)) {
       copy.push(orderCopy);
       setOrder(copy);
@@ -168,11 +168,27 @@ function App() {
     haveAnyChecked();
   };
 
-  // 발주일 입력함수. 발주일 입력하면 발주번호 자동으로 입력.납기일자도
-  const changeStartDay = (value) => {
+  // 발주일 입력함수. 발주일 입력하면 발주번호 자동으로 입력.납기일자도. + 발주일에 맞춰서 년도랑 달 강제이동
+  const changeStartDay = async (value) => {
     let copy = { ...orderCopy };
     copy.startDay = value;
 
+    // 발주일에 맞춰서 프론트 페이지 강제 이동(발주번호 자동적으로 늘어나게하기에도, 날짜 수정에도 용이)
+    let valueYear = Number(
+      `${value[0]}` + `${value[1]}` + `${value[2]}` + `${value[3]}`
+    );
+    let valueMonth = Number(`${value[5]}` + `${value[6]}`);
+
+    //입력한 년도나 달이 지금 보이는 년도나 달과 다를경우
+    if (
+      valueYear !== thisMonthYear.year ||
+      valueMonth !== thisMonthYear.month
+    ) {
+      let copy = { ...thisMonthYear };
+      copy.year = valueYear;
+      copy.month = valueMonth;
+      setThisMonthYear(copy);
+    }
     // 입력값에서 앞의 6자리 따오기
     let orderCodeDate =
       `${value[2]}` +
@@ -360,7 +376,7 @@ function App() {
     }
     // 버튼 '추가하기'로 바꿔야하고 ui state 수정
     setAddState(-1);
-    console.log(orderCopy);
+
     // 서버 update
     try {
       await axios.put(
@@ -660,7 +676,8 @@ function App() {
                   >
                     ◀︎
                   </button>
-                  {thisMonthYear.year}년 {thisMonthYear.month}월 발주 관리
+                  {thisMonthYear.year}년{' '}
+                  {String(thisMonthYear.month).padStart(2, '0')}월 발주 관리
                   <button
                     onClick={() => {
                       nextMonth();
