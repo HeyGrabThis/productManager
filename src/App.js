@@ -375,8 +375,8 @@ function App() {
     }
   };
 
-  // 리스트에 있는 긴급발주 checkbox로 긴급발주 state수정
-  const changeListEmergency = (idx) => {
+  // 리스트에 있는 긴급발주 checkbox로 긴급발주 state수정 및 서버통해 db도 수정
+  const changeListEmergency = async (idx) => {
     if (order[idx].emergency === 1) {
       let copy = [...order];
       copy[idx].emergency = 0;
@@ -385,6 +385,16 @@ function App() {
       let copy = [...order];
       copy[idx].emergency = 1;
       setOrder(copy);
+    }
+    try {
+      await axios.put(
+        'http://localhost:3001/api/product/update/list/' + order[idx].orderId,
+        {
+          emergency_yn: order[idx].emergency,
+        }
+      );
+    } catch (err) {
+      console.log(err);
     }
   };
 

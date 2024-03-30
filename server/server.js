@@ -106,3 +106,18 @@ app.put('/api/product/update/:id', (req, res) => {
     }
   });
 });
+
+// 긴급발주 리스트 체크로 수정(발주관리에서)
+app.put('/api/product/update/list/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q =
+    'UPDATE product_management SET `emergency_yn` = ? WHERE order_id = ?';
+  const value = req.body.emergency_yn;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
