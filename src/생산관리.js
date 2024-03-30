@@ -185,9 +185,6 @@ const ProductManagement = (props) => {
   // 나중에 order 서버에서 받아와서 order2 생성
   let [order2, setOrder2] = useState([]);
 
-  // 리스트 수정상태 나타내기위한 state생성
-  let [modifyState, setModifyState] = useState(0);
-
   //서버에서 데이터 받아오기
   const getServerOrderList2 = async () => {
     let thisMonthYearCopy =
@@ -243,7 +240,7 @@ const ProductManagement = (props) => {
   return (
     <div>
       <div className="title">
-        <h4>
+        <h3>
           <button
             onClick={() => {
               preMonth();
@@ -251,7 +248,8 @@ const ProductManagement = (props) => {
           >
             ◀︎
           </button>
-          {thisMonthYear.year}년 {thisMonthYear.month}월 생산계획 관리
+          {thisMonthYear.year}년 {String(thisMonthYear.month).padStart(2, '0')}
+          월 생산계획 관리
           <button
             onClick={() => {
               nextMonth();
@@ -259,7 +257,7 @@ const ProductManagement = (props) => {
           >
             ▶︎
           </button>
-        </h4>
+        </h3>
         <div className="product-btn">
           <button
             className="product-loadBtn"

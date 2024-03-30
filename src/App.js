@@ -4,6 +4,7 @@ import product from './product';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import ProductManagement from './생산관리';
 import axios from 'axios';
+import FirstTeam from './teamPage/first_team';
 
 function App() {
   let navigate = useNavigate();
@@ -84,38 +85,43 @@ function App() {
   });
   // 발주 신규 추가하기. 바로 서버에 추가
   const addOrder = async () => {
-    let copy = [...order];
-    // 그 달에 해당하는 데이터인지 판단해서 프론트에 보이는 것 조절
-    let thisMonthYearCopy =
-      `${thisMonthYear.year}`.slice(-2) +
-      String(thisMonthYear.month).padStart(2, '0');
-    // orderCode가 날짜와 같을 때만 화면에 보이게
-    if (thisMonthYearCopy === orderCopy.orderCode.slice(0, 4)) {
-      copy.push(orderCopy);
-      setOrder(copy);
-    }
-    try {
-      await axios.post('http://localhost:3001/api/product/insert', {
-        color: '',
-        emergency_yn: orderCopy.emergency,
-        etc1: orderCopy.etc,
-        etc2: '',
-        order_code: orderCopy.orderCode,
-        order_end_date: orderCopy.endDay,
-        order_start_date: orderCopy.startDay,
-        ordersheet_collect_yn: 0,
-        ordersheet_publish_yn: 0,
-        product_code: orderCopy.productCode,
-        product_complmplete_yn: 0,
-        product_quantity: orderCopy.quantity,
-        product_team: '',
-        report_yn: 0,
-        shipment_complete_yn: 0,
-        special_note: '',
-        special_note_yn: '',
-      });
-    } catch (err) {
-      console.log(err);
+    //날짜를 지정하지 않으면 (orderCode가 없는 경우)또는 품목코드가 없는 경우 추가 못하도록
+    if (!orderCopy.startDay || !orderCopy.productCode) {
+      alert('발주일과 품목코드를 입력해주세요');
+    } else {
+      let copy = [...order];
+      // 그 달에 해당하는 데이터인지 판단해서 프론트에 보이는 것 조절
+      let thisMonthYearCopy =
+        `${thisMonthYear.year}`.slice(-2) +
+        String(thisMonthYear.month).padStart(2, '0');
+      // orderCode가 날짜와 같을 때만 화면에 보이게
+      if (thisMonthYearCopy === orderCopy.orderCode.slice(0, 4)) {
+        copy.push(orderCopy);
+        setOrder(copy);
+      }
+      try {
+        await axios.post('http://localhost:3001/api/product/insert', {
+          color: '',
+          emergency_yn: orderCopy.emergency,
+          etc1: orderCopy.etc,
+          etc2: '',
+          order_code: orderCopy.orderCode,
+          order_end_date: orderCopy.endDay,
+          order_start_date: orderCopy.startDay,
+          ordersheet_collect_yn: 0,
+          ordersheet_publish_yn: 0,
+          product_code: orderCopy.productCode,
+          product_complmplete_yn: 0,
+          product_quantity: orderCopy.quantity,
+          product_team: '',
+          report_yn: 0,
+          shipment_complete_yn: 0,
+          special_note: '',
+          special_note_yn: '',
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }
   };
 
@@ -424,35 +430,63 @@ function App() {
 
   // 수정완료한 값들 다시 원래 배열에 넣기. 서버에도 적용
   const addModify = async (idx) => {
-    let copy = [...order];
-    // 그 달에 해당하는 데이터인지 판단해서 프론트에 보이는 것 조절
-    let thisMonthYearCopy =
-      `${thisMonthYear.year}`.slice(-2) +
-      String(thisMonthYear.month).padStart(2, '0');
-    // orderCode가 날짜와 같으면 화면에 보이게
-    if (thisMonthYearCopy === orderCopy.orderCode.slice(0, 4)) {
-      copy[idx] = orderCopy;
-      setOrder(copy);
-    }
-    // 버튼 '추가하기'로 바꿔야하고 ui state 수정
-    setAddState(-1);
+    //날짜를 지정하지 않으면 (orderCode가 없는 경우)또는 품목코드가 없는 경우 추가 못하도록
+    if (!orderCopy.startDay || !orderCopy.productCode) {
+      alert('발주일과 품목코드를 입력해주세요');
+      setAddState(-1);
+      setOrderCopy({
+        checked: 0,
+        orderCode: '',
+        startDay: '',
+        emergency: 0,
+        company: '',
+        productCode: '',
+        productName: '',
+        quantity: 0,
+        endDay: '',
+        etc: '',
+        etc2: '',
+        color: '',
+        team: '',
+        orderSheetPublish: 0,
+        orderSheetCollect: 0,
+        report: 0,
+        specialNote: '',
+        specialNote_yn: 0,
+        product_complmplete_yn: 0,
+        shipment_complete_yn: 0,
+      });
+    } else {
+      let copy = [...order];
+      // 그 달에 해당하는 데이터인지 판단해서 프론트에 보이는 것 조절
+      let thisMonthYearCopy =
+        `${thisMonthYear.year}`.slice(-2) +
+        String(thisMonthYear.month).padStart(2, '0');
+      // orderCode가 날짜와 같으면 화면에 보이게
+      if (thisMonthYearCopy === orderCopy.orderCode.slice(0, 4)) {
+        copy[idx] = orderCopy;
+        setOrder(copy);
+      }
+      // 버튼 '추가하기'로 바꿔야하고 ui state 수정
+      setAddState(-1);
 
-    // 서버 update
-    try {
-      await axios.put(
-        'http://localhost:3001/api/product/update/' + orderCopy.orderId,
-        {
-          emergency_yn: orderCopy.emergency,
-          etc1: orderCopy.etc,
-          order_code: orderCopy.orderCode,
-          order_end_date: orderCopy.endDay,
-          order_start_date: orderCopy.startDay,
-          product_code: orderCopy.productCode,
-          product_quantity: orderCopy.quantity,
-        }
-      );
-    } catch (err) {
-      console.log(err);
+      // 서버 update
+      try {
+        await axios.put(
+          'http://localhost:3001/api/product/update/' + orderCopy.orderId,
+          {
+            emergency_yn: orderCopy.emergency,
+            etc1: orderCopy.etc,
+            order_code: orderCopy.orderCode,
+            order_end_date: orderCopy.endDay,
+            order_start_date: orderCopy.startDay,
+            product_code: orderCopy.productCode,
+            product_quantity: orderCopy.quantity,
+          }
+        );
+      } catch (err) {
+        console.log(err);
+      }
     }
   };
 
@@ -630,65 +664,36 @@ function App() {
         'http://localhost:3001/api/product/' + thisMonthYearCopy
       );
       let copy = res.data.map((elm, idx) => {
-        //품목코드 조회해서 품목명과 회사 저장(품목코드 있으면)
-        if (elm.product_code) {
-          let product_codeValue = elm.product_code;
-          let sameProduct = product.find(
-            (elm) => product_codeValue === elm.productCode
-          );
-          return {
-            checked: 0,
-            orderCode: elm.order_code,
-            startDay: elm.order_start_date,
-            emergency: Number(elm.emergency_yn),
-            productCode: elm.product_code,
-            quantity: elm.product_quantity,
-            endDay: elm.order_end_date,
-            etc: elm.etc1,
-            etc2: elm.etc2,
-            color: elm.color,
-            team: elm.product_team,
-            orderSheetPublish: Number(elm.ordersheet_publish_yn),
-            orderSheetCollect: Number(elm.ordersheet_collect_yn),
-            report: Number(elm.report_yn),
-            specialNote: elm.special_note,
-            specialNote_yn: Number(elm.special_note_yn),
-            product_complmplete_yn: Number(elm.product_complmplete_yn),
-            shipment_complete_yn: Number(elm.shipment_complete_yn),
-            //품목명과 회사 parsing
-            productName: sameProduct.productName,
-            company: sameProduct.company,
-            //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
-            orderId: elm.order_id,
-          };
-        } else {
-          //품목코드 없으면
-          return {
-            checked: 0,
-            orderCode: elm.order_code,
-            startDay: elm.order_start_date,
-            emergency: Number(elm.emergency_yn),
-            productCode: elm.product_code,
-            quantity: elm.product_quantity,
-            endDay: elm.order_end_date,
-            etc: elm.etc1,
-            etc2: elm.etc2,
-            color: elm.color,
-            team: elm.product_team,
-            orderSheetPublish: Number(elm.ordersheet_publish_yn),
-            orderSheetCollect: Number(elm.ordersheet_collect_yn),
-            report: Number(elm.report_yn),
-            specialNote: elm.special_note,
-            specialNote_yn: Number(elm.special_note_yn),
-            product_complmplete_yn: Number(elm.product_complmplete_yn),
-            shipment_complete_yn: Number(elm.shipment_complete_yn),
-            //품목명과 회사 parsing
-            productName: '',
-            company: '',
-            //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
-            orderId: elm.order_id,
-          };
-        }
+        //품목코드 조회해서 품목명과 회사 저장
+        let product_codeValue = elm.product_code;
+        let sameProduct = product.find(
+          (elm) => product_codeValue === elm.productCode
+        );
+        return {
+          checked: 0,
+          orderCode: elm.order_code,
+          startDay: elm.order_start_date,
+          emergency: Number(elm.emergency_yn),
+          productCode: elm.product_code,
+          quantity: elm.product_quantity,
+          endDay: elm.order_end_date,
+          etc: elm.etc1,
+          etc2: elm.etc2,
+          color: elm.color,
+          team: elm.product_team,
+          orderSheetPublish: Number(elm.ordersheet_publish_yn),
+          orderSheetCollect: Number(elm.ordersheet_collect_yn),
+          report: Number(elm.report_yn),
+          specialNote: elm.special_note,
+          specialNote_yn: Number(elm.special_note_yn),
+          product_complmplete_yn: Number(elm.product_complmplete_yn),
+          shipment_complete_yn: Number(elm.shipment_complete_yn),
+          //품목명과 회사 parsing
+          productName: sameProduct.productName,
+          company: sameProduct.company,
+          //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
+          orderId: elm.order_id,
+        };
       });
       setOrder(copy);
     } catch (err) {
@@ -1084,7 +1089,7 @@ function App() {
         }
       ></Route>
       <Route path="/product생산관리" element={<ProductManagement />}></Route>
-      <Route path="/team1"></Route>
+      <Route path="/team1" element={<FirstTeam />}></Route>
       <Route path="/team2"></Route>
       <Route path="/team3"></Route>
     </Routes>

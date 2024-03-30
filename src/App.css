@@ -144,3 +144,12 @@ tbody tr .productNameInput {
 .product-main td {
   text-align: center;
 }
+
+/* 팀별 페이지 */
+.teamMain {
+  display: flex;
+  justify-content: space-around;
+}
+.teamTable-thead {
+  font-size: 13px;
+}
