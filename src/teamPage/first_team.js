@@ -41,10 +41,46 @@ const FirstTeam = (props) => {
     day: todayDay,
   });
 
+  //첫번째 날짜, 두번째 날짜, 세번째 날짜를 저장할 state생성
+  let [threeDates, setThreeDates] = useState();
+
+  //오늘로부터 3일의 날짜구하기
+  const getThisDays = () => {
+    let firstDate = new Date();
+    let secondDate = new Date(firstDate);
+    let thirdDate = new Date(firstDate);
+    secondDate.setDate(firstDate.getDate() + 1);
+    thirdDate.setDate(firstDate.getDate() + 2);
+
+    const firstDateObj = {
+      year: firstDate.getFullYear(),
+      month: firstDate.getMonth() + 1,
+      date: firstDate.getDate(),
+      day: firstDate.getDay(),
+    };
+    const secondDateObj = {
+      year: secondDate.getFullYear(),
+      month: secondDate.getMonth() + 1,
+      date: secondDate.getDate(),
+      day: secondDate.getDay(),
+    };
+    const thirdDateObj = {
+      year: thirdDate.getFullYear(),
+      month: thirdDate.getMonth() + 1,
+      date: thirdDate.getDate(),
+      day: thirdDate.getDay(),
+    };
+    setThreeDates([firstDateObj, secondDateObj, thirdDateObj]);
+  };
+  useEffect(() => {
+    getThisDays();
+    console.log(threeDates);
+  }, []);
+
   return (
     <div>
       <div className="teamTitle">
-        <h3>1팀</h3>
+        <h2>1팀</h2>
       </div>
       <div className="teamMain">
         <div className="teamTable1">
@@ -52,8 +88,15 @@ const FirstTeam = (props) => {
             <thead className="teamTable-thead">
               <tr>
                 <th colSpan={10}>
-                  {thisMonthYear.year}년 {thisMonthYear.month}월{' '}
-                  {thisMonthYear.date}일 {thisMonthYear.day}
+                  {threeDates
+                    ? `${threeDates[0].year}` +
+                      `년` +
+                      `${threeDates[0].month}` +
+                      `월` +
+                      `${threeDates[0].date}` +
+                      `일` +
+                      `${threeDates[0].day}`
+                    : null}
                 </th>
               </tr>
               <tr>
@@ -77,8 +120,15 @@ const FirstTeam = (props) => {
             <thead className="teamTable-thead">
               <tr>
                 <th colSpan={10}>
-                  {thisMonthYear.year}년 {thisMonthYear.month}월{' '}
-                  {thisMonthYear.date}일 {thisMonthYear.day}
+                  {threeDates
+                    ? `${threeDates[1].year}` +
+                      `년` +
+                      `${threeDates[1].month}` +
+                      `월` +
+                      `${threeDates[1].date}` +
+                      `일` +
+                      `${threeDates[1].day}`
+                    : null}
                 </th>
               </tr>
               <tr>
@@ -102,8 +152,15 @@ const FirstTeam = (props) => {
             <thead className="teamTable-thead">
               <tr>
                 <th colSpan={10}>
-                  {thisMonthYear.year}년 {thisMonthYear.month}월{' '}
-                  {thisMonthYear.date}일 {thisMonthYear.day}
+                  {threeDates
+                    ? `${threeDates[2].year}` +
+                      `년` +
+                      `${threeDates[2].month}` +
+                      `월` +
+                      `${threeDates[2].date}` +
+                      `일` +
+                      `${threeDates[2].day}`
+                    : null}
                 </th>
               </tr>
               <tr>

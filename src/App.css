@@ -145,7 +145,21 @@ tbody tr .productNameInput {
   text-align: center;
 }
 
+.product-thead tr th {
+  font-size: 14px;
+}
+
+.product-thead tr th button {
+  font-size: 10px;
+}
+
 /* 팀별 페이지 */
+.teamTitle {
+  display: flex;
+  justify-content: center;
+  padding-top: 3vh;
+  padding-bottom: 2vh;
+}
 .teamMain {
   display: flex;
   justify-content: space-around;

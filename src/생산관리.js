@@ -237,6 +237,88 @@ const ProductManagement = (props) => {
     getServerOrderList2();
   }, [thisMonthYear]);
 
+  //정렬
+  // 발주번호 정렬
+  const sortOrderCode = () => {
+    let copy = order2.toSorted(
+      (a, b) => a.orderCode.replace('-', '') - b.orderCode.replace('-', '')
+    );
+    setOrder2(copy);
+  };
+  const reverseSortOrderCode = () => {
+    let copy = order2.toSorted(
+      (a, b) => b.orderCode.replace('-', '') - a.orderCode.replace('-', '')
+    );
+    setOrder2(copy);
+  };
+
+  // 긴급발주 정렬
+  const sortEmergency = () => {
+    let copy = order2.toSorted((a, b) => b.emergency - a.emergency);
+    setOrder2(copy);
+  };
+  const reverseSortEmergency = () => {
+    let copy = order2.toSorted((a, b) => a.emergency - b.emergency);
+    setOrder2(copy);
+  };
+
+  // 품목코드 정렬
+  const sortProductCode = () => {
+    let copy = order2.toSorted((a, b) =>
+      a.productCode.localeCompare(b.productCode)
+    );
+    setOrder2(copy);
+  };
+  const reverseSortProductCode = () => {
+    let copy = order2.toSorted((a, b) =>
+      b.productCode.localeCompare(a.productCode)
+    );
+    setOrder2(copy);
+  };
+
+  // 발주수량 정렬
+  const sortQuantity = () => {
+    let copy = order2.toSorted((a, b) => a.quantity - b.quantity);
+    setOrder2(copy);
+  };
+  const reverseSortQuantity = () => {
+    let copy = order2.toSorted((a, b) => b.quantity - a.quantity);
+    setOrder2(copy);
+  };
+
+  //납기일 정렬
+  const sortEndDay = () => {
+    let copy = order2.toSorted(
+      (a, b) => new Date(a.endDay) - new Date(b.endDay)
+    );
+    setOrder2(copy);
+  };
+  const reverseSortEndDay = () => {
+    let copy = order2.toSorted(
+      (a, b) => new Date(b.endDay) - new Date(a.endDay)
+    );
+    setOrder2(copy);
+  };
+
+  //컬러 정렬
+  const sortColor = () => {
+    let copy = order2.toSorted((a, b) => a.color.localeCompare(b.color));
+    setOrder2(copy);
+  };
+  const reverseSortColor = () => {
+    let copy = order2.toSorted((a, b) => b.color.localeCompare(a.color));
+    setOrder2(copy);
+  };
+
+  //팀 정렬
+  const sortTeam = () => {
+    let copy = order2.toSorted((a, b) => a.team.localeCompare(b.team));
+    setOrder2(copy);
+  };
+  const reverseSortTeam = () => {
+    let copy = order2.toSorted((a, b) => b.team.localeCompare(a.team));
+    setOrder2(copy);
+  };
   return (
     <div>
       <div className="title">
@@ -278,19 +360,131 @@ const ProductManagement = (props) => {
       </div>
       <div className="product-main">
         <table>
-          <thead>
+          <thead className="product-thead">
             <tr>
               <th>NO.</th>
-              <th>발주번호</th>
-              <th>긴급</th>
+              <th>
+                발주번호
+                <button
+                  onClick={() => {
+                    sortOrderCode();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortOrderCode();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
+              <th>
+                긴급
+                <button
+                  onClick={() => {
+                    sortEmergency();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortEmergency();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
               <th>고객사</th>
-              <th>품목코드</th>
+              <th>
+                품목코드
+                <button
+                  onClick={() => {
+                    sortProductCode();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortProductCode();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
               <th>품목명</th>
-              <th>수량</th>
-              <th>COLOR</th>
+              <th>
+                수량
+                <button
+                  onClick={() => {
+                    sortQuantity();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortQuantity();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
+              <th>
+                COLOR
+                <button
+                  onClick={() => {
+                    sortColor();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortColor();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
               <th>발주일자</th>
-              <th>납기일자</th>
-              <th>생산팀</th>
+              <th>
+                납기일자
+                <button
+                  onClick={() => {
+                    sortEndDay();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortEndDay();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
+              <th>
+                생산팀
+                <button
+                  onClick={() => {
+                    sortTeam();
+                  }}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => {
+                    reverseSortTeam();
+                  }}
+                >
+                  ▲
+                </button>
+              </th>
               <th>Order Sheet 발행</th>
               <th>Order Sheet 회수</th>
               <th>성적서 발행</th>
