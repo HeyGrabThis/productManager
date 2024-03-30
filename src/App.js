@@ -8,7 +8,7 @@ import axios from 'axios';
 function App() {
   let navigate = useNavigate();
   const changeProductPage = () => {
-    if (window.confirm('저장하지않은 정보는 사라집니다')) {
+    if (window.confirm('생산관리 페이지로 이동합니다')) {
       navigate('/product생산관리');
     }
   };
@@ -179,56 +179,104 @@ function App() {
     );
     let valueMonth = Number(`${value[5]}` + `${value[6]}`);
 
-    //입력한 년도나 달이 지금 보이는 년도나 달과 다를경우
+    //입력한 년도나 달이 지금 보이는 년도나 달과 다를경우 value값으로 년도와 달 이동
     if (
       valueYear !== thisMonthYear.year ||
       valueMonth !== thisMonthYear.month
     ) {
-      let copy = { ...thisMonthYear };
-      copy.year = valueYear;
-      copy.month = valueMonth;
-      setThisMonthYear(copy);
-    }
-    // 입력값에서 앞의 6자리 따오기
-    let orderCodeDate =
-      `${value[2]}` +
-      `${value[3]}` +
-      `${value[5]}` +
-      `${value[6]}` +
-      `${value[8]}` +
-      `${value[9]}`;
-    // orderCode목록에서 앞의 6글자 겹치는 것 있는지 확인하고 있으면 뒤의 두글자 숫자배열로 반환
-    let sameOrderCodeDateArray = order.map((elm) => {
-      if (elm.orderCode.substring(0, 6) === orderCodeDate) {
-        return Number(elm.orderCode.substring(7, 9));
+      let copyMonthYear = { ...thisMonthYear };
+      copyMonthYear.year = valueYear;
+      copyMonthYear.month = valueMonth;
+      setThisMonthYear(copyMonthYear);
+      // 입력한 년도나 달이 지금 보이는 년도나 달과 다를경우인데 이미 똑같은 날짜에 발주가 있다면
+      // 뒤 넘버링하기 위해 서버와 값 비교
+      try {
+        //서버에서 년도,달,날짜 같은 ordercode리스트 가져오기
+        const sameDateList = await axios.get(
+          'http://localhost:3001/api/product/' +
+            `${value[2]}` +
+            `${value[3]}` +
+            `${value[5]}` +
+            `${value[6]}` +
+            `${value[8]}` +
+            `${value[9]}`
+        );
+        //그것들 중 뒤에 넘버링한 수만 숫자배열로 담기
+        const sameDateListNum = sameDateList.data.map((elm, idx) => {
+          return Number(elm.order_code[7] + elm.order_code[8]);
+        });
+        // return Number(`${elm.order_code[8]}` + `${elm.order_code[9]}`);
+        //넘버링 수 중에 가장 큰 수
+        const mostBigNum = sameDateListNum.sort((a, b) => b - a);
+        // 그 수가 있다면 하나 더 큰 수로 넘버링해서 orderCode입력
+        if (mostBigNum[0]) {
+          copy.orderCode =
+            `${value[2]}` +
+            `${value[3]}` +
+            `${value[5]}` +
+            `${value[6]}` +
+            `${value[8]}` +
+            `${value[9]}` +
+            `-` +
+            String(mostBigNum[0] + 1).padStart(2, '0');
+        } else {
+          copy.orderCode =
+            `${value[2]}` +
+            `${value[3]}` +
+            `${value[5]}` +
+            `${value[6]}` +
+            `${value[8]}` +
+            `${value[9]}` +
+            `-` +
+            `01`;
+        }
+      } catch (err) {
+        console.log(err);
       }
-    });
-    // 뒤의 두 숫자 배열 내림차순으로 정렬
-    let sameOrderCodeTopId = sameOrderCodeDateArray.sort((a, b) => b - a);
-
-    // 내림차순으로 정렬한 숫자중 가장 앞의 큰값 있는지 확인
-    // 있다면 +1해서 적용, 없다면 그냥 01로
-    if (sameOrderCodeTopId[0]) {
-      copy.orderCode =
-        `${value[2]}` +
-        `${value[3]}` +
-        `${value[5]}` +
-        `${value[6]}` +
-        `${value[8]}` +
-        `${value[9]}` +
-        `-` +
-        `${String(sameOrderCodeTopId[0] + 1).padStart(2, '0')}`;
     } else {
-      copy.orderCode =
+      // 입력한 년도나 달이 지금 보이는 년도나 달과 같은경우
+      // 입력값에서 앞의 6자리 따오기
+      let orderCodeDate =
         `${value[2]}` +
         `${value[3]}` +
         `${value[5]}` +
         `${value[6]}` +
         `${value[8]}` +
-        `${value[9]}` +
-        `-` +
-        `01`;
+        `${value[9]}`;
+      // orderCode목록에서 앞의 6글자 겹치는 것 있는지 확인하고 있으면 뒤의 두글자 숫자배열로 반환
+      let sameOrderCodeDateArray = order.map((elm) => {
+        if (elm.orderCode.substring(0, 6) === orderCodeDate) {
+          return Number(elm.orderCode.substring(7, 9));
+        }
+      });
+      // 뒤의 두 숫자 배열 내림차순으로 정렬
+      let sameOrderCodeTopId = sameOrderCodeDateArray.sort((a, b) => b - a);
+
+      // 내림차순으로 정렬한 숫자중 가장 앞의 큰값 있는지 확인
+      // 있다면 +1해서 적용, 없다면 그냥 01로
+      if (sameOrderCodeTopId[0]) {
+        copy.orderCode =
+          `${value[2]}` +
+          `${value[3]}` +
+          `${value[5]}` +
+          `${value[6]}` +
+          `${value[8]}` +
+          `${value[9]}` +
+          `-` +
+          `${String(sameOrderCodeTopId[0] + 1).padStart(2, '0')}`;
+      } else {
+        copy.orderCode =
+          `${value[2]}` +
+          `${value[3]}` +
+          `${value[5]}` +
+          `${value[6]}` +
+          `${value[8]}` +
+          `${value[9]}` +
+          `-` +
+          `01`;
+      }
     }
+
     // 납기일 자동 설정
     const startDayCopy = new Date(value);
     let endDayCopy = new Date(startDayCopy);
@@ -397,28 +445,6 @@ function App() {
   };
 
   // 발주번호 정렬
-  // const sortOrderCode = () => {
-  //   let copy = [...order];
-  //   // 발주번호에 '-'가 있는 경우 이걸 없애고 순서까지 담은 배열 생성.
-  //   let copy2 = copy.map((elm, idx) => {
-  //     let c = elm.orderCode.replace('-', '');
-  //     let d = idx;
-  //     return { c, d };
-  //   });
-  //   // copy2의 '-'를 없앤 발주번호에 따라 정렬하고 순서만 뽑은 배열 생성
-  //   let copy3 = copy2
-  //     .toSorted((a, b) => a.c - b.c)
-  //     .map((elm) => {
-  //       return elm.d;
-  //     });
-  //   // copy3의 값을 아까 복사해둔 copy의 순서에 넣어 새로운 배열 생성
-  //   let copy4 = copy3.map((elm) => {
-  //     return copy[elm];
-  //   });
-  //   setOrder(copy4);
-  // };
-  // 발주번호 정렬
-  // 위 코드 간단하게 만듦
   const sortOrderCode = () => {
     if (addState !== -1) {
       alert('수정을 완료해주세요');
@@ -582,82 +608,84 @@ function App() {
     }
   };
 
-  // 페이지가 로드되면 서버에서 order로 옮겨줌. 무슨 년도,달에 위치해있는지 확인하고 그에 맞는 데이터 가져오기
-  useEffect(() => {
+  // 서버에서 order로 옮겨줌. 무슨 년도,달에 위치해있는지 확인하고 그에 맞는 데이터 가져오기
+  const getServerOrderList = async () => {
     let thisMonthYearCopy =
       `${thisMonthYear.year}`.slice(-2) +
       String(thisMonthYear.month).padStart(2, '0');
-
-    axios
-      .get('http://localhost:3001/api/product/' + thisMonthYearCopy)
-      .then((res) => {
-        //parsing작업
-        let copy = res.data.map((elm, idx) => {
-          //품목코드 조회해서 품목명과 회사 저장(품목코드 있으면)
-          if (elm.product_code) {
-            let product_codeValue = elm.product_code;
-            let sameProduct = product.find(
-              (elm) => product_codeValue === elm.productCode
-            );
-            return {
-              checked: 0,
-              orderCode: elm.order_code,
-              startDay: elm.order_start_date,
-              emergency: Number(elm.emergency_yn),
-              productCode: elm.product_code,
-              quantity: elm.product_quantity,
-              endDay: elm.order_end_date,
-              etc: elm.etc1,
-              etc2: elm.etc2,
-              color: elm.color,
-              team: elm.team,
-              orderSheetPublish: Number(elm.ordersheet_publish_yn),
-              orderSheetCollect: Number(elm.ordersheet_collect_yn),
-              report: Number(elm.report_yn),
-              specialNote: elm.special_note,
-              specialNote_yn: Number(elm.special_note_yn),
-              product_complmplete_yn: Number(elm.product_complmplete_yn),
-              shipment_complete_yn: Number(elm.shipment_complete_yn),
-              //품목명과 회사 parsing
-              productName: sameProduct.productName,
-              company: sameProduct.company,
-              //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
-              orderId: elm.order_id,
-            };
-          } else {
-            //품목코드 없으면
-            return {
-              checked: 0,
-              orderCode: elm.order_code,
-              startDay: elm.order_start_date,
-              emergency: Number(elm.emergency_yn),
-              productCode: elm.product_code,
-              quantity: elm.product_quantity,
-              endDay: elm.order_end_date,
-              etc: elm.etc1,
-              etc2: elm.etc2,
-              color: elm.color,
-              team: elm.team,
-              orderSheetPublish: Number(elm.ordersheet_publish_yn),
-              orderSheetCollect: Number(elm.ordersheet_collect_yn),
-              report: Number(elm.report_yn),
-              specialNote: elm.special_note,
-              specialNote_yn: Number(elm.special_note_yn),
-              product_complmplete_yn: Number(elm.product_complmplete_yn),
-              shipment_complete_yn: Number(elm.shipment_complete_yn),
-              //품목명과 회사 parsing
-              productName: '',
-              company: '',
-              //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
-              orderId: elm.order_id,
-            };
-          }
-        });
-        setOrder(copy);
-      })
-      .catch((err) => {
-        console.log(err);
+    try {
+      let res = await axios.get(
+        'http://localhost:3001/api/product/' + thisMonthYearCopy
+      );
+      let copy = res.data.map((elm, idx) => {
+        //품목코드 조회해서 품목명과 회사 저장(품목코드 있으면)
+        if (elm.product_code) {
+          let product_codeValue = elm.product_code;
+          let sameProduct = product.find(
+            (elm) => product_codeValue === elm.productCode
+          );
+          return {
+            checked: 0,
+            orderCode: elm.order_code,
+            startDay: elm.order_start_date,
+            emergency: Number(elm.emergency_yn),
+            productCode: elm.product_code,
+            quantity: elm.product_quantity,
+            endDay: elm.order_end_date,
+            etc: elm.etc1,
+            etc2: elm.etc2,
+            color: elm.color,
+            team: elm.team,
+            orderSheetPublish: Number(elm.ordersheet_publish_yn),
+            orderSheetCollect: Number(elm.ordersheet_collect_yn),
+            report: Number(elm.report_yn),
+            specialNote: elm.special_note,
+            specialNote_yn: Number(elm.special_note_yn),
+            product_complmplete_yn: Number(elm.product_complmplete_yn),
+            shipment_complete_yn: Number(elm.shipment_complete_yn),
+            //품목명과 회사 parsing
+            productName: sameProduct.productName,
+            company: sameProduct.company,
+            //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
+            orderId: elm.order_id,
+          };
+        } else {
+          //품목코드 없으면
+          return {
+            checked: 0,
+            orderCode: elm.order_code,
+            startDay: elm.order_start_date,
+            emergency: Number(elm.emergency_yn),
+            productCode: elm.product_code,
+            quantity: elm.product_quantity,
+            endDay: elm.order_end_date,
+            etc: elm.etc1,
+            etc2: elm.etc2,
+            color: elm.color,
+            team: elm.team,
+            orderSheetPublish: Number(elm.ordersheet_publish_yn),
+            orderSheetCollect: Number(elm.ordersheet_collect_yn),
+            report: Number(elm.report_yn),
+            specialNote: elm.special_note,
+            specialNote_yn: Number(elm.special_note_yn),
+            product_complmplete_yn: Number(elm.product_complmplete_yn),
+            shipment_complete_yn: Number(elm.shipment_complete_yn),
+            //품목명과 회사 parsing
+            productName: '',
+            company: '',
+            //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
+            orderId: elm.order_id,
+          };
+        }
       });
+      setOrder(copy);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  // 페이지가 로드되거나 thisMonthYear의 값이 바뀌면 서버에서 데이터 받아오는 함수 실행
+  useEffect(() => {
+    getServerOrderList();
   }, [thisMonthYear]);
 
   return (
