@@ -9,9 +9,7 @@ import axios from 'axios';
 const ProductManagement = (props) => {
   let navigate = useNavigate();
   const changeMainPage = () => {
-    if (window.confirm('저장하지않은 정보는 사라집니다')) {
-      navigate('/');
-    }
+    navigate('/');
   };
 
   let nowDate = new Date();
@@ -48,119 +46,199 @@ const ProductManagement = (props) => {
     }
   };
 
-  //드롭다운.컬러
+  //드롭다운.컬러. 서버연결까지
   const colorOptions = ['빨강', '파랑', '노랑'];
-  const changeColor = (value, idx) => {
+  const changeColor = async (value, idx) => {
     let copy = [...order2];
     copy[idx].color = value;
     setOrder2(copy);
+    try {
+      await axios.put(
+        'http://localhost:3001/api/product/update/color/' + copy[idx].orderId,
+        {
+          color: value,
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  //드롭다운.생산팀
+  //드롭다운.생산팀. 서버연결까지
   const teamOptions = ['1팀', '2팀', '3팀'];
-  const changeTeam = (value, idx) => {
+  const changeTeam = async (value, idx) => {
     let copy = [...order2];
     copy[idx].team = value;
     setOrder2(copy);
+    try {
+      await axios.put(
+        'http://localhost:3001/api/product/update/team/' + copy[idx].orderId,
+        {
+          product_team: value,
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  //orderSheet발행완료 입력함수
-  const changeSheetPublish = (idx) => {
+  //orderSheet발행완료 입력함수. 서버연결까지
+  const changeSheetPublish = async (idx) => {
+    let copy = [...order2];
     if (order2[idx].orderSheetPublish === 0) {
-      let copy = [...order2];
       copy[idx].orderSheetPublish += 1;
-      setOrder2(copy);
     } else {
-      let copy = [...order2];
       copy[idx].orderSheetPublish -= 1;
-      setOrder2(copy);
+    }
+    setOrder2(copy);
+    try {
+      await axios.put(
+        'http://localhost:3001/api/product/update/orderSheetPublish/' +
+          copy[idx].orderId,
+        {
+          ordersheet_publish_yn: copy[idx].orderSheetPublish,
+        }
+      );
+    } catch (err) {
+      console.log(err);
     }
   };
 
-  //orderSheet회수완료 입력함수
-  const changeSheetCollect = (idx) => {
+  //orderSheet회수완료 입력함수. 서버연결까지
+  const changeSheetCollect = async (idx) => {
+    let copy = [...order2];
     if (order2[idx].orderSheetCollect === 0) {
-      let copy = [...order2];
       copy[idx].orderSheetCollect += 1;
-      setOrder2(copy);
     } else {
-      let copy = [...order2];
       copy[idx].orderSheetCollect -= 1;
-      setOrder2(copy);
+    }
+    setOrder2(copy);
+    try {
+      await axios.put(
+        'http://localhost:3001/api/product/update/orderSheetCollect/' +
+          copy[idx].orderId,
+        {
+          ordersheet_collect_yn: copy[idx].orderSheetCollect,
+        }
+      );
+    } catch (err) {
+      console.log(err);
     }
   };
 
-  //성적서 발행 입력함수
-  const changeReport = (idx) => {
+  //성적서 발행 입력함수. 서버연결까지
+  const changeReport = async (idx) => {
+    let copy = [...order2];
     if (order2[idx].report === 0) {
-      let copy = [...order2];
       copy[idx].report += 1;
-      setOrder2(copy);
     } else {
-      let copy = [...order2];
       copy[idx].report -= 1;
-      setOrder2(copy);
+    }
+    setOrder2(copy);
+    try {
+      await axios.put(
+        'http://localhost:3001/api/product/update/report/' + copy[idx].orderId,
+        {
+          report_yn: copy[idx].report,
+        }
+      );
+    } catch (err) {
+      console.log(err);
     }
   };
 
-  //특이사항 입력함수
-  const changeSpecialNote = (value, idx) => {
+  //특이사항 입력함수. 서버연결까지
+  const changeSpecialNote = async (value, idx) => {
     let copy = [...order2];
     copy[idx].specialNote = value;
     setOrder2(copy);
+    try {
+      await axios.put(
+        'http://localhost:3001/api/product/update/specialNote/' +
+          copy[idx].orderId,
+        {
+          special_note: value,
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  //비고 입력함수
-  const changeEtc2 = (value, idx) => {
+  //비고 입력함수. 서버연결까지
+  const changeEtc2 = async (value, idx) => {
     let copy = [...order2];
     copy[idx].etc2 = value;
     setOrder2(copy);
+    try {
+      await axios.put(
+        'http://localhost:3001/api/product/update/etc2/' + copy[idx].orderId,
+        {
+          etc2: value,
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   // 나중에 order 서버에서 받아와서 order2 생성
   let [order2, setOrder2] = useState([]);
 
+  // 리스트 수정상태 나타내기위한 state생성
+  let [modifyState, setModifyState] = useState(0);
+
   //서버에서 데이터 받아오기
-  useEffect(() => {
-    axios
-      .get('http://localhost:3001/api/product')
-      .then((res) => {
-        //parsing작업
-        let copy = res.data.map((elm, idx) => {
-          //품목코드 조회해서 품목명과 회사 저장
-          let product_codeValue = elm.product_code;
-          let sameProduct = product.find(
-            (elm) => product_codeValue === elm.productCode
-          );
-          return {
-            orderCode: elm.order_code,
-            startDay: elm.order_start_date,
-            emergency: Number(elm.emergency_yn),
-            productCode: elm.product_code,
-            quantity: elm.product_quantity,
-            endDay: elm.order_end_date,
-            etc: elm.etc1,
-            etc2: elm.etc2,
-            color: elm.color,
-            team: elm.team,
-            orderSheetPublish: Number(elm.ordersheet_publish_yn),
-            orderSheetCollect: Number(elm.ordersheet_collect_yn),
-            report: Number(elm.report_yn),
-            specialNote: elm.special_note,
-            specialNote_yn: Number(elm.special_note_yn),
-            product_complmplete_yn: Number(elm.product_complmplete_yn),
-            shipment_complete_yn: Number(elm.shipment_complete_yn),
-            //품목명과 회사 parsing
-            productName: sameProduct.productName,
-            company: sameProduct.company,
-          };
-        });
-        setOrder2(copy);
-      })
-      .catch((err) => {
-        console.log(err);
+  const getServerOrderList2 = async () => {
+    let thisMonthYearCopy =
+      `${thisMonthYear.year}`.slice(-2) +
+      String(thisMonthYear.month).padStart(2, '0');
+    try {
+      let res = await axios.get(
+        'http://localhost:3001/api/product/' + thisMonthYearCopy
+      );
+      //parsing작업
+      let copy = res.data.map((elm, idx) => {
+        //품목코드 조회해서 품목명과 회사 저장
+        let product_codeValue = elm.product_code;
+        let sameProduct = product.find(
+          (elm) => product_codeValue === elm.productCode
+        );
+        return {
+          orderCode: elm.order_code,
+          startDay: elm.order_start_date,
+          emergency: Number(elm.emergency_yn),
+          productCode: elm.product_code,
+          quantity: elm.product_quantity,
+          endDay: elm.order_end_date,
+          etc: elm.etc1,
+          etc2: elm.etc2,
+          color: elm.color,
+          team: elm.product_team,
+          orderSheetPublish: Number(elm.ordersheet_publish_yn),
+          orderSheetCollect: Number(elm.ordersheet_collect_yn),
+          report: Number(elm.report_yn),
+          specialNote: elm.special_note,
+          specialNote_yn: Number(elm.special_note_yn),
+          product_complmplete_yn: Number(elm.product_complmplete_yn),
+          shipment_complete_yn: Number(elm.shipment_complete_yn),
+          //품목명과 회사 parsing
+          productName: sameProduct.productName,
+          company: sameProduct.company,
+          //id 받아오기
+          orderId: elm.order_id,
+        };
       });
-  }, []);
+      setOrder2(copy);
+      console.log(copy);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  //thisMonthYear바뀔때마다, mount될 때 서버에서 데이터 받아오기
+  useEffect(() => {
+    getServerOrderList2();
+  }, [thisMonthYear]);
 
   return (
     <div>
@@ -183,8 +261,14 @@ const ProductManagement = (props) => {
           </button>
         </h4>
         <div className="product-btn">
-          <button className="product-loadBtn">불러오기</button>
-          <button className="product-saveBtn">저장하기</button>
+          <button
+            className="product-loadBtn"
+            onClick={() => {
+              getServerOrderList2();
+            }}
+          >
+            불러오기
+          </button>
           <button
             onClick={() => {
               changeMainPage();
@@ -241,7 +325,7 @@ const ProductManagement = (props) => {
                           onChange={(e) => {
                             changeColor(e.value, idx);
                           }}
-                          value={'선택'}
+                          value={elm.color ? elm.color : '선택'}
                         />
                       </td>
                       <td>{elm.startDay}</td>
@@ -252,7 +336,7 @@ const ProductManagement = (props) => {
                           onChange={(e) => {
                             changeTeam(e.value, idx);
                           }}
-                          value={'선택'}
+                          value={elm.team ? elm.team : '선택'}
                         />
                       </td>
                       <td>

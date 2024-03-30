@@ -8,7 +8,9 @@ import axios from 'axios';
 function App() {
   let navigate = useNavigate();
   const changeProductPage = () => {
-    if (window.confirm('생산관리 페이지로 이동합니다')) {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
       navigate('/product생산관리');
     }
   };
@@ -80,7 +82,7 @@ function App() {
     product_complmplete_yn: 0,
     shipment_complete_yn: 0,
   });
-  // 발주 추가하기. 바로 서버에 추가
+  // 발주 신규 추가하기. 바로 서버에 추가
   const addOrder = async () => {
     let copy = [...order];
     // 그 달에 해당하는 데이터인지 판단해서 프론트에 보이는 것 조절
@@ -94,23 +96,23 @@ function App() {
     }
     try {
       await axios.post('http://localhost:3001/api/product/insert', {
-        color: null,
+        color: '',
         emergency_yn: orderCopy.emergency,
         etc1: orderCopy.etc,
-        etc2: null,
+        etc2: '',
         order_code: orderCopy.orderCode,
         order_end_date: orderCopy.endDay,
         order_start_date: orderCopy.startDay,
-        ordersheet_collect_yn: null,
-        ordersheet_publish_yn: null,
+        ordersheet_collect_yn: 0,
+        ordersheet_publish_yn: 0,
         product_code: orderCopy.productCode,
-        product_complmplete_yn: null,
+        product_complmplete_yn: 0,
         product_quantity: orderCopy.quantity,
-        product_team: null,
-        report_yn: null,
-        shipment_complete_yn: null,
-        special_note: null,
-        special_note_yn: null,
+        product_team: '',
+        report_yn: 0,
+        shipment_complete_yn: 0,
+        special_note: '',
+        special_note_yn: '',
       });
     } catch (err) {
       console.log(err);
@@ -645,7 +647,7 @@ function App() {
             etc: elm.etc1,
             etc2: elm.etc2,
             color: elm.color,
-            team: elm.team,
+            team: elm.product_team,
             orderSheetPublish: Number(elm.ordersheet_publish_yn),
             orderSheetCollect: Number(elm.ordersheet_collect_yn),
             report: Number(elm.report_yn),
@@ -672,7 +674,7 @@ function App() {
             etc: elm.etc1,
             etc2: elm.etc2,
             color: elm.color,
-            team: elm.team,
+            team: elm.product_team,
             orderSheetPublish: Number(elm.ordersheet_publish_yn),
             orderSheetCollect: Number(elm.ordersheet_collect_yn),
             report: Number(elm.report_yn),

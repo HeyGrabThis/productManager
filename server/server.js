@@ -121,3 +121,107 @@ app.put('/api/product/update/list/:id', (req, res) => {
     }
   });
 });
+
+//생산계획관리 page
+
+// 생산계획관리에서 color수정
+app.put('/api/product/update/color/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q = 'UPDATE product_management SET `color` = ? WHERE order_id = ?';
+  const value = req.body.color;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
+
+// 생산계획관리에서 team수정
+app.put('/api/product/update/team/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q =
+    'UPDATE product_management SET `product_team` = ? WHERE order_id = ?';
+  const value = req.body.product_team;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
+
+// 생산계획관리에서 orderSheet 발행수정
+app.put('/api/product/update/orderSheetPublish/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q =
+    'UPDATE product_management SET `ordersheet_publish_yn` = ? WHERE order_id = ?';
+  const value = req.body.ordersheet_publish_yn;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
+
+// 생산계획관리에서 orderSheet 회수수정
+app.put('/api/product/update/orderSheetCollect/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q =
+    'UPDATE product_management SET `ordersheet_collect_yn` = ? WHERE order_id = ?';
+  const value = req.body.ordersheet_collect_yn;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
+
+// 생산계획관리에서 성적서 발행수정
+app.put('/api/product/update/report/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q = 'UPDATE product_management SET `report_yn` = ? WHERE order_id = ?';
+  const value = req.body.report_yn;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
+
+// 생산계획관리에서 특이사항수정
+app.put('/api/product/update/specialNote/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q =
+    'UPDATE product_management SET `special_note` = ? WHERE order_id = ?';
+  const value = req.body.special_note;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
+
+// 생산계획관리에서 비고2수정
+app.put('/api/product/update/etc2/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q = 'UPDATE product_management SET `etc2` = ? WHERE order_id = ?';
+  const value = req.body.etc2;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
