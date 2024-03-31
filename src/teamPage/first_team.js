@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css';
+import product from '../product';
 
 const FirstTeam = (props) => {
   let nowDate = new Date();
@@ -41,62 +42,69 @@ const FirstTeam = (props) => {
     day: todayDay,
   });
 
-  //첫번째 날짜, 두번째 날짜, 세번째 날짜를 저장할 state생성
-  let [threeDates, setThreeDates] = useState();
+  //order를 담아서 렌더링할 state생성
+  let [order3, setOrder3] = useState([]);
 
-  //오늘로부터 3일의 날짜구하기
-  const getThisDays = () => {
-    let firstDate = new Date();
-    let secondDate = new Date(firstDate);
-    let thirdDate = new Date(firstDate);
-    secondDate.setDate(firstDate.getDate() + 1);
-    thirdDate.setDate(firstDate.getDate() + 2);
+  // 서버에서 order로 옮겨줌. 무슨 년도,달에 위치해있는지 확인하고 그에 맞는 데이터 가져오기
+  const getServerOrderList = async () => {
+    let thisMonthYearCopy =
+      `${thisMonthYear.year}`.slice(-2) +
+      String(thisMonthYear.month).padStart(2, '0') +
+      String(thisMonthYear.date).padStart(2, '0');
 
-    const firstDateObj = {
-      year: firstDate.getFullYear(),
-      month: firstDate.getMonth() + 1,
-      date: firstDate.getDate(),
-      day: firstDate.getDay(),
-    };
-    const secondDateObj = {
-      year: secondDate.getFullYear(),
-      month: secondDate.getMonth() + 1,
-      date: secondDate.getDate(),
-      day: secondDate.getDay(),
-    };
-    const thirdDateObj = {
-      year: thirdDate.getFullYear(),
-      month: thirdDate.getMonth() + 1,
-      date: thirdDate.getDate(),
-      day: thirdDate.getDay(),
-    };
-    setThreeDates([firstDateObj, secondDateObj, thirdDateObj]);
+    try {
+      let res = await axios.get(
+        'http://localhost:3001/api/team1/' + thisMonthYearCopy
+      );
+      let copy = res.data.map((elm, idx) => {
+        //품목코드 조회해서 품목명과 회사 저장
+        let product_codeValue = elm.product_code;
+        let sameProduct = product.find(
+          (elm) => product_codeValue === elm.productCode
+        );
+        return {
+          orderCode: elm.order_code,
+          startDay: elm.order_start_date,
+          emergency: Number(elm.emergency_yn),
+          productCode: elm.product_code,
+          quantity: elm.product_quantity,
+          endDay: elm.order_end_date,
+          color: elm.color,
+          team: elm.product_team,
+          specialNote: elm.special_note,
+          specialNote_yn: Number(elm.special_note_yn),
+          product_complmplete_yn: Number(elm.product_complmplete_yn),
+          shipment_complete_yn: Number(elm.shipment_complete_yn),
+          //품목명과 회사 parsing
+          productName: sameProduct.productName,
+          company: sameProduct.company,
+          //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
+          orderId: elm.order_id,
+        };
+      });
+      setOrder3(copy);
+      console.log(copy);
+    } catch (err) {
+      console.log(err);
+    }
   };
   useEffect(() => {
-    getThisDays();
-    console.log(threeDates);
-  }, []);
+    getServerOrderList();
+  }, [thisMonthYear]);
 
   return (
     <div>
       <div className="teamTitle">
-        <h2>1팀</h2>
+        <h1>1팀</h1>
       </div>
       <div className="teamMain">
         <div className="teamTable1">
           <table>
             <thead className="teamTable-thead">
               <tr>
-                <th colSpan={10}>
-                  {threeDates
-                    ? `${threeDates[0].year}` +
-                      `년` +
-                      `${threeDates[0].month}` +
-                      `월` +
-                      `${threeDates[0].date}` +
-                      `일` +
-                      `${threeDates[0].day}`
-                    : null}
+                <th colSpan={10} className="teamTable-date">
+                  {thisMonthYear.year}년 {thisMonthYear.month}월{' '}
+                  {thisMonthYear.date}일
                 </th>
               </tr>
               <tr>
@@ -112,71 +120,24 @@ const FirstTeam = (props) => {
                 <th>특이사항</th>
               </tr>
             </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div className="teamTable2">
-          <table>
-            <thead className="teamTable-thead">
-              <tr>
-                <th colSpan={10}>
-                  {threeDates
-                    ? `${threeDates[1].year}` +
-                      `년` +
-                      `${threeDates[1].month}` +
-                      `월` +
-                      `${threeDates[1].date}` +
-                      `일` +
-                      `${threeDates[1].day}`
-                    : null}
-                </th>
-              </tr>
-              <tr>
-                <th>NO.</th>
-                <th>발주번호</th>
-                <th>고객사</th>
-                <th>품목코드</th>
-                <th>품목명</th>
-                <th>수량</th>
-                <th>COLOR</th>
-                <th>생산완료</th>
-                <th>출하완료</th>
-                <th>특이사항</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div className="teamTable3">
-          <table>
-            <thead className="teamTable-thead">
-              <tr>
-                <th colSpan={10}>
-                  {threeDates
-                    ? `${threeDates[2].year}` +
-                      `년` +
-                      `${threeDates[2].month}` +
-                      `월` +
-                      `${threeDates[2].date}` +
-                      `일` +
-                      `${threeDates[2].day}`
-                    : null}
-                </th>
-              </tr>
-              <tr>
-                <th>NO.</th>
-                <th>발주번호</th>
-                <th>고객사</th>
-                <th>품목코드</th>
-                <th>품목명</th>
-                <th>수량</th>
-                <th>COLOR</th>
-                <th>생산완료</th>
-                <th>출하완료</th>
-                <th>특이사항</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
+            <tbody>
+              {order3.map((elm, idx) => {
+                return (
+                  <tr key={idx}>
+                    <td>{idx + 1}</td>
+                    <td>{elm.orderCode}</td>
+                    <td>{elm.company}</td>
+                    <td>{elm.productCode}</td>
+                    <td>{elm.productName}</td>
+                    <td>{elm.quantity}</td>
+                    <td>{elm.color}</td>
+                    <td>{elm.product_complmplete_yn}</td>
+                    <td>{elm.shipment_complete_yn}</td>
+                    <td>{elm.specialNote_yn}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </table>
         </div>
       </div>

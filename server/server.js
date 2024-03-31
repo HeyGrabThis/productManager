@@ -225,3 +225,20 @@ app.put('/api/product/update/etc2/:id', (req, res) => {
     }
   });
 });
+
+// team 1 데이터 get
+app.get('/api/team1/:id', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  const q = `SELECT * FROM product_management WHERE order_code LIKE '?%'`;
+
+  const thisMonthYear = Number(req.params.id);
+
+  db.query(q, [thisMonthYear], (err, data) => {
+    if (!err) {
+      res.send(data);
+    } else {
+      console.log(err);
+      res.send(err);
+    }
+  });
+});

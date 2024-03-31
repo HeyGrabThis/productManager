@@ -227,7 +227,6 @@ const ProductManagement = (props) => {
         };
       });
       setOrder2(copy);
-      console.log(copy);
     } catch (err) {
       console.log(err);
     }

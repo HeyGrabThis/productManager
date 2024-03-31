@@ -165,5 +165,8 @@ tbody tr .productNameInput {
   justify-content: space-around;
 }
 .teamTable-thead {
-  font-size: 13px;
+  font-size: 18px;
+}
+.teamTable-date {
+  font-size: 22px;
 }

@@ -12,7 +12,7 @@ function App() {
     if (addState !== -1) {
       alert('수정을 완료해주세요');
     } else {
-      navigate('/product생산관리');
+      navigate('/productmanager');
     }
   };
 
@@ -487,6 +487,8 @@ function App() {
       } catch (err) {
         console.log(err);
       }
+      //다시 불러옴으로써 프론트상 리스트가 꼬이는 문제해결
+      getServerOrderList();
     }
   };
 
@@ -1088,7 +1090,7 @@ function App() {
           </div>
         }
       ></Route>
-      <Route path="/product생산관리" element={<ProductManagement />}></Route>
+      <Route path="/productmanager" element={<ProductManagement />}></Route>
       <Route path="/team1" element={<FirstTeam />}></Route>
       <Route path="/team2"></Route>
       <Route path="/team3"></Route>
