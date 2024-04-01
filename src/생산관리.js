@@ -227,6 +227,7 @@ const ProductManagement = (props) => {
         };
       });
       setOrder2(copy);
+      setSortState(sortState + 1);
     } catch (err) {
       console.log(err);
     }
@@ -318,6 +319,13 @@ const ProductManagement = (props) => {
     let copy = order2.toSorted((a, b) => b.team.localeCompare(a.team));
     setOrder2(copy);
   };
+
+  // 데이터를 받아오면 발주번호로 자동 정렬하도록 state생성
+  let [sortState, setSortState] = useState(0);
+  useEffect(() => {
+    sortOrderCode();
+  }, [sortState]);
+
   return (
     <div>
       <div className="title">

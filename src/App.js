@@ -28,35 +28,27 @@ function App() {
     year: nowYear,
   });
   const preMonth = () => {
-    if (addState !== -1) {
-      alert('수정을 완료해주세요');
+    if (thisMonthYear.month === 1) {
+      let copy = { ...thisMonthYear };
+      copy.month = 12;
+      copy.year -= 1;
+      setThisMonthYear(copy);
     } else {
-      if (thisMonthYear.month === 1) {
-        let copy = { ...thisMonthYear };
-        copy.month = 12;
-        copy.year -= 1;
-        setThisMonthYear(copy);
-      } else {
-        let copy = { ...thisMonthYear };
-        copy.month -= 1;
-        setThisMonthYear(copy);
-      }
+      let copy = { ...thisMonthYear };
+      copy.month -= 1;
+      setThisMonthYear(copy);
     }
   };
   const nextMonth = () => {
-    if (addState !== -1) {
-      alert('수정을 완료해주세요');
+    if (thisMonthYear.month === 12) {
+      let copy = { ...thisMonthYear };
+      copy.month = 1;
+      copy.year += 1;
+      setThisMonthYear(copy);
     } else {
-      if (thisMonthYear.month === 12) {
-        let copy = { ...thisMonthYear };
-        copy.month = 1;
-        copy.year += 1;
-        setThisMonthYear(copy);
-      } else {
-        let copy = { ...thisMonthYear };
-        copy.month += 1;
-        setThisMonthYear(copy);
-      }
+      let copy = { ...thisMonthYear };
+      copy.month += 1;
+      setThisMonthYear(copy);
     }
   };
   // 주문 목록 state
@@ -496,14 +488,10 @@ function App() {
 
   // 발주번호 정렬
   const sortOrderCode = () => {
-    if (addState !== -1) {
-      alert('수정을 완료해주세요');
-    } else {
-      let copy = order.toSorted(
-        (a, b) => a.orderCode.replace('-', '') - b.orderCode.replace('-', '')
-      );
-      setOrder(copy);
-    }
+    let copy = order.toSorted(
+      (a, b) => a.orderCode.replace('-', '') - b.orderCode.replace('-', '')
+    );
+    setOrder(copy);
   };
   const reverseSortOrderCode = () => {
     if (addState !== -1) {
@@ -700,6 +688,8 @@ function App() {
         };
       });
       setOrder(copy);
+      //자동정렬위해 state변경
+      setSortState(sortState + 1);
     } catch (err) {
       console.log(err);
     }
@@ -708,6 +698,12 @@ function App() {
   useEffect(() => {
     getServerOrderList();
   }, [thisMonthYear]);
+
+  // 데이터를 받아오면 발주번호로 자동 정렬하도록 state생성
+  let [sortState, setSortState] = useState(0);
+  useEffect(() => {
+    sortOrderCode();
+  }, [sortState]);
 
   return (
     <Routes>
@@ -720,7 +716,11 @@ function App() {
                 <h1 id="title">
                   <button
                     onClick={() => {
-                      preMonth();
+                      if (addState !== -1) {
+                        alert('수정을 완료해주세요');
+                      } else {
+                        preMonth();
+                      }
                     }}
                   >
                     ◀︎
@@ -729,7 +729,11 @@ function App() {
                   {String(thisMonthYear.month).padStart(2, '0')}월 발주 관리
                   <button
                     onClick={() => {
-                      nextMonth();
+                      if (addState !== -1) {
+                        alert('수정을 완료해주세요');
+                      } else {
+                        nextMonth();
+                      }
                     }}
                   >
                     ▶︎
@@ -776,7 +780,11 @@ function App() {
                         발주번호
                         <button
                           onClick={() => {
-                            sortOrderCode();
+                            if (addState !== -1) {
+                              alert('수정을 완료해주세요');
+                            } else {
+                              sortOrderCode();
+                            }
                           }}
                         >
                           ▼
@@ -959,7 +967,10 @@ function App() {
                                   }
                                 />
                               </td>
-                              <td className="modifyBtn-border">
+                              <td
+                                className="modifyBtn-border"
+                                style={{ background: 'white' }}
+                              >
                                 <button
                                   onClick={() => {
                                     modifyProduct(idx);

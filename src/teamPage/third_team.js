@@ -144,6 +144,7 @@ const ThirdTeam = (props) => {
         };
       });
       setOrder3(copy);
+      setSortState(sortState + 1);
     } catch (err) {
       console.log(err);
     }
@@ -272,6 +273,12 @@ const ThirdTeam = (props) => {
     let copy = order3.toSorted((a, b) => b.color.localeCompare(a.color));
     setOrder3(copy);
   };
+
+  // 데이터를 받아오면 발주번호로 자동 정렬하도록 state생성
+  let [sortState, setSortState] = useState(0);
+  useEffect(() => {
+    sortOrderCode();
+  }, [sortState]);
 
   return (
     <div>
