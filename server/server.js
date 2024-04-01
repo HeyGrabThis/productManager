@@ -41,7 +41,7 @@ app.post('/api/product/insert', (req, res) => {
   res.header('Access-Control-Allow-Origin', '*');
 
   const sqlQuery =
-    'INSERT INTO product_management(`color`, `emergency_yn`, `etc1`, `etc2`, `order_code`, `order_end_date`, `order_start_date`, `ordersheet_collect_yn`, `ordersheet_publish_yn`, `product_code`, `product_complmplete_yn`, `product_quantity`, `product_team`, `report_yn`, `shipment_complete_yn`, `special_note`, `special_note_yn`) VALUES(?)';
+    'INSERT INTO product_management(`color`, `emergency_yn`, `etc1`, `etc2`, `order_code`, `order_end_date`, `order_start_date`, `ordersheet_collect_yn`, `ordersheet_publish_yn`, `product_code`, `product_complete_yn`, `product_quantity`, `product_team`, `report_yn`, `shipment_complete_yn`, `special_note`, `special_note_yn`) VALUES(?)';
   const values = [
     req.body.color,
     req.body.emergency_yn,
@@ -53,7 +53,7 @@ app.post('/api/product/insert', (req, res) => {
     req.body.ordersheet_collect_yn,
     req.body.ordersheet_publish_yn,
     req.body.product_code,
-    req.body.product_complmplete_yn,
+    req.body.product_complete_yn,
     req.body.product_quantity,
     req.body.product_team,
     req.body.report_yn,
@@ -229,9 +229,9 @@ app.put('/api/product/update/etc2/:id', (req, res) => {
 // team 1 데이터 get
 app.get('/api/team1/:id', (req, res) => {
   res.header('Access-Control-Allow-Origin', '*');
-  const q = `SELECT * FROM product_management WHERE order_code LIKE '?%'`;
+  const q = `SELECT * FROM product_management WHERE product_team = '1팀' AND order_end_date = ?`;
 
-  const thisMonthYear = Number(req.params.id);
+  const thisMonthYear = req.params.id;
 
   db.query(q, [thisMonthYear], (err, data) => {
     if (!err) {
@@ -239,6 +239,51 @@ app.get('/api/team1/:id', (req, res) => {
     } else {
       console.log(err);
       res.send(err);
+    }
+  });
+});
+
+// team page에서 생산완료 update
+app.put('/api/product/update/product_complete_yn/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q =
+    'UPDATE product_management SET `product_complete_yn` = ? WHERE order_id = ?';
+  const value = req.body.product_complete_yn;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
+
+// team page에서 출하완료 update
+app.put('/api/product/update/shipment_complete_yn/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q =
+    'UPDATE product_management SET `shipment_complete_yn` = ? WHERE order_id = ?';
+  const value = req.body.shipment_complete_yn;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
+
+// team page에서 특이사항 update
+app.put('/api/product/update/specialNote_yn/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q =
+    'UPDATE product_management SET `special_note_yn` = ? WHERE order_id = ?';
+  const value = req.body.special_note_yn;
+  db.query(q, [value, orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
     }
   });
 });

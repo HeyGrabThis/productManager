@@ -153,6 +153,10 @@ tbody tr .productNameInput {
   font-size: 10px;
 }
 
+.product-list tr td {
+  font-size: 14px;
+}
+
 /* 팀별 페이지 */
 .teamTitle {
   display: flex;
@@ -169,4 +173,21 @@ tbody tr .productNameInput {
 }
 .teamTable-date {
   font-size: 22px;
+}
+.teamTable-date button {
+  position: relative;
+  top: -0.4vh;
+  margin-left: 1vw;
+  margin-right: 1vw;
+}
+.teamTable-tbody {
+  text-align: center;
+}
+.teamBtn {
+  position: absolute;
+  left: 80vw;
+  top: 6vh;
+}
+.teamBtn button {
+  margin-right: 1vw;
 }

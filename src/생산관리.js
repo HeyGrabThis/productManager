@@ -217,7 +217,7 @@ const ProductManagement = (props) => {
           report: Number(elm.report_yn),
           specialNote: elm.special_note,
           specialNote_yn: Number(elm.special_note_yn),
-          product_complmplete_yn: Number(elm.product_complmplete_yn),
+          product_complete_yn: Number(elm.product_complete_yn),
           shipment_complete_yn: Number(elm.shipment_complete_yn),
           //품목명과 회사 parsing
           productName: sameProduct.productName,

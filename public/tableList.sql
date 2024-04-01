@@ -18,7 +18,7 @@ create table product_management (
     report_yn varchar(1),
     special_note varchar(255),
     etc2 varchar(255),
-    product_complmplete_yn varchar(1),
+    product_complete_yn varchar(1),
     shipment_complete_yn varchar(1),
     special_note_yn varchar(1), 
     order_id int NOT NULL,
