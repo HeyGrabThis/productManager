@@ -243,6 +243,40 @@ app.get('/api/team1/:id', (req, res) => {
   });
 });
 
+// team 2 데이터 get
+app.get('/api/team2/:id', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  const q = `SELECT * FROM product_management WHERE product_team = '2팀' AND order_end_date = ?`;
+
+  const thisMonthYear = req.params.id;
+
+  db.query(q, [thisMonthYear], (err, data) => {
+    if (!err) {
+      res.send(data);
+    } else {
+      console.log(err);
+      res.send(err);
+    }
+  });
+});
+
+// team 3 데이터 get
+app.get('/api/team3/:id', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  const q = `SELECT * FROM product_management WHERE product_team = '3팀' AND order_end_date = ?`;
+
+  const thisMonthYear = req.params.id;
+
+  db.query(q, [thisMonthYear], (err, data) => {
+    if (!err) {
+      res.send(data);
+    } else {
+      console.log(err);
+      res.send(err);
+    }
+  });
+});
+
 // team page에서 생산완료 update
 app.put('/api/product/update/product_complete_yn/:id', (req, res) => {
   const orderId = req.params.id;

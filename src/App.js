@@ -5,6 +5,8 @@ import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import ProductManagement from './생산관리';
 import axios from 'axios';
 import FirstTeam from './teamPage/first_team';
+import SecondTeam from './teamPage/second_team';
+import ThirdTeam from './teamPage/third_team';
 
 function App() {
   let navigate = useNavigate();
@@ -1092,8 +1094,8 @@ function App() {
       ></Route>
       <Route path="/productmanager" element={<ProductManagement />}></Route>
       <Route path="/team1" element={<FirstTeam />}></Route>
-      <Route path="/team2"></Route>
-      <Route path="/team3"></Route>
+      <Route path="/team2" element={<SecondTeam />}></Route>
+      <Route path="/team3" element={<ThirdTeam />}></Route>
     </Routes>
   );
 }
