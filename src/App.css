@@ -191,3 +191,52 @@ tbody tr .productNameInput {
 .teamBtn button {
   margin-right: 1vw;
 }
+
+/* 품목코드 페이지 부분 */
+.code-topPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 79.5vh;
+  overflow-y: scroll;
+}
+.code-head {
+  margin: 3vh 0;
+}
+.code-tail {
+  position: fixed;
+  bottom: 0;
+  height: 20vh;
+  width: 100vw;
+  background-color: rgb(182, 182, 182);
+}
+.code-inputzone {
+  position: fixed;
+  bottom: 8vh;
+  margin-left: 50%;
+  transform: translate(-50%, 0);
+  background-color: white;
+}
+.code-inputzone table tbody input {
+  border: 0;
+}
+.code-addBtn {
+  position: fixed;
+  height: 4vh;
+  bottom: 3vh;
+  margin-left: 50%;
+  transform: translate(-50%, 0);
+}
+.code-main table {
+  text-align: center;
+}
+.code-delTh {
+  border-top: hidden;
+  border-right: hidden;
+  border-bottom: hidden;
+}
+.code-delTd {
+  border-top: hidden;
+  border-right: hidden;
+  border-bottom: hidden;
+}

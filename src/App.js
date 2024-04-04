@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import product from './product';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import ProductManagement from './생산관리';
 import axios from 'axios';
 import FirstTeam from './teamPage/first_team';
 import SecondTeam from './teamPage/second_team';
 import ThirdTeam from './teamPage/third_team';
+import ProductCodePage from './product_code_page';
 
 function App() {
   let navigate = useNavigate();
@@ -51,6 +51,32 @@ function App() {
       setThisMonthYear(copy);
     }
   };
+
+  // product_code와 name,company 데이터를 담을 state
+  let [product, setProduct] = useState([]);
+
+  // getProductCode를 실행하고나서 서버에서 order데이터를 받아오기 위해 useEffect에 쓸 state 생성
+  let [productDataState, setProductDataState] = useState(0);
+
+  // productCode목록 서버에서 가져오기
+  const getProductCode = async () => {
+    try {
+      let res = await axios.get('http://localhost:3001/api/productcode');
+      let copy = res.data.map((elm) => {
+        return {
+          productCode: elm.product_code,
+          productName: elm.product_name,
+          company: elm.company,
+          id: elm.id,
+        };
+      });
+      setProduct(copy);
+      setProductDataState(productDataState + 1);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   // 주문 목록 state
   let [order, setOrder] = useState([]);
 
@@ -362,7 +388,7 @@ function App() {
               return elm;
             }
           });
-          console.log(copy3);
+
           copy3.map(async (elm) => {
             try {
               await axios.delete(
@@ -661,6 +687,7 @@ function App() {
         let sameProduct = product.find(
           (elm) => product_codeValue === elm.productCode
         );
+        console.log(sameProduct);
         return {
           checked: 0,
           orderCode: elm.order_code,
@@ -694,12 +721,17 @@ function App() {
       console.log(err);
     }
   };
-  // 페이지가 로드되거나 thisMonthYear의 값이 바뀌면 서버에서 데이터 받아오는 함수 실행
+  // 페이지가 로드되거나 thisMonthYear의 값이 바뀌면 서버에서 product 데이터 받아오는 함수 실행
   useEffect(() => {
-    getServerOrderList();
+    getProductCode();
   }, [thisMonthYear]);
 
-  // 데이터를 받아오면 발주번호로 자동 정렬하도록 state생성
+  //product 데이터 받아오면 orderlist받아오는 함수 실행
+  useEffect(() => {
+    getServerOrderList();
+  }, [productDataState]);
+
+  // orderlist데이터를 받아오면 발주번호로 자동 정렬하도록 state생성
   let [sortState, setSortState] = useState(0);
   useEffect(() => {
     sortOrderCode();
@@ -1107,6 +1139,7 @@ function App() {
       <Route path="/team1" element={<FirstTeam />}></Route>
       <Route path="/team2" element={<SecondTeam />}></Route>
       <Route path="/team3" element={<ThirdTeam />}></Route>
+      <Route path="/productcode" element={<ProductCodePage />}></Route>
     </Routes>
   );
 }

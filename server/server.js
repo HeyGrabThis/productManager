@@ -321,3 +321,52 @@ app.put('/api/product/update/specialNote_yn/:id', (req, res) => {
     }
   });
 });
+
+//product_code 테이블 데이터 가져오기
+app.get('/api/productcode', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  const q = `SELECT * FROM product_code`;
+
+  db.query(q, (err, data) => {
+    if (!err) {
+      res.send(data);
+    } else {
+      console.log(err);
+      res.send(err);
+    }
+  });
+});
+
+//product_code 테이블에 추가하기
+app.post('/api/productcode/insert', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+
+  const sqlQuery =
+    'INSERT INTO product_code(`product_code`, `company`, `product_name`) VALUES(?)';
+  const values = [
+    req.body.product_code,
+    req.body.company,
+    req.body.product_name,
+  ];
+  db.query(sqlQuery, [values], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      res.json('success');
+    }
+  });
+});
+
+//product_code 테이블에서 데이터 삭제
+app.delete('/api/productcode/del/:id', (req, res) => {
+  const orderId = req.params.id;
+  const q = 'DELETE FROM product_code WHERE id = ?';
+
+  db.query(q, [orderId], (err, data) => {
+    if (err) {
+      return res.json(err);
+    } else {
+      return res.json('success');
+    }
+  });
+});
