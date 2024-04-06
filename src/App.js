@@ -10,11 +10,20 @@ import ProductCodePage from './product_code_page';
 
 function App() {
   let navigate = useNavigate();
+  //생산관리 페이지로 이동
   const changeProductPage = () => {
     if (addState !== -1) {
       alert('수정을 완료해주세요');
     } else {
       navigate('/productmanager');
+    }
+  };
+  //품목코드 페이지로 이동
+  const changePCPage = () => {
+    if (addState !== -1) {
+      alert('수정을 완료해주세요');
+    } else {
+      navigate('/productcode');
     }
   };
 
@@ -674,51 +683,53 @@ function App() {
 
   // 서버에서 order로 옮겨줌. 무슨 년도,달에 위치해있는지 확인하고 그에 맞는 데이터 가져오기
   const getServerOrderList = async () => {
-    let thisMonthYearCopy =
-      `${thisMonthYear.year}`.slice(-2) +
-      String(thisMonthYear.month).padStart(2, '0');
-    try {
-      let res = await axios.get(
-        'http://localhost:3001/api/product/' + thisMonthYearCopy
-      );
-      let copy = res.data.map((elm, idx) => {
-        //품목코드 조회해서 품목명과 회사 저장
-        let product_codeValue = elm.product_code;
-        let sameProduct = product.find(
-          (elm) => product_codeValue === elm.productCode
+    //품목코드 정보를 담은 product state에 값이 있을 때만
+    if (product[0]) {
+      let thisMonthYearCopy =
+        `${thisMonthYear.year}`.slice(-2) +
+        String(thisMonthYear.month).padStart(2, '0');
+      try {
+        let res = await axios.get(
+          'http://localhost:3001/api/product/' + thisMonthYearCopy
         );
-        console.log(sameProduct);
-        return {
-          checked: 0,
-          orderCode: elm.order_code,
-          startDay: elm.order_start_date,
-          emergency: Number(elm.emergency_yn),
-          productCode: elm.product_code,
-          quantity: elm.product_quantity,
-          endDay: elm.order_end_date,
-          etc: elm.etc1,
-          etc2: elm.etc2,
-          color: elm.color,
-          team: elm.product_team,
-          orderSheetPublish: Number(elm.ordersheet_publish_yn),
-          orderSheetCollect: Number(elm.ordersheet_collect_yn),
-          report: Number(elm.report_yn),
-          specialNote: elm.special_note,
-          specialNote_yn: Number(elm.special_note_yn),
-          product_complete_yn: Number(elm.product_complete_yn),
-          shipment_complete_yn: Number(elm.shipment_complete_yn),
-          //품목명과 회사 parsing
-          productName: sameProduct.productName,
-          company: sameProduct.company,
-          //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
-          orderId: elm.order_id,
-        };
-      });
-      setOrder(copy);
-      //자동정렬위해 state변경
-      setSortState(sortState + 1);
-    } catch (err) {
-      console.log(err);
+        let copy = res.data.map((elm, idx) => {
+          //품목코드 조회해서 품목명과 회사 저장
+          let product_codeValue = elm.product_code;
+          let sameProduct = product.find(
+            (elm) => product_codeValue === elm.productCode
+          );
+          return {
+            checked: 0,
+            orderCode: elm.order_code,
+            startDay: elm.order_start_date,
+            emergency: Number(elm.emergency_yn),
+            productCode: elm.product_code,
+            quantity: elm.product_quantity,
+            endDay: elm.order_end_date,
+            etc: elm.etc1,
+            etc2: elm.etc2,
+            color: elm.color,
+            team: elm.product_team,
+            orderSheetPublish: Number(elm.ordersheet_publish_yn),
+            orderSheetCollect: Number(elm.ordersheet_collect_yn),
+            report: Number(elm.report_yn),
+            specialNote: elm.special_note,
+            specialNote_yn: Number(elm.special_note_yn),
+            product_complete_yn: Number(elm.product_complete_yn),
+            shipment_complete_yn: Number(elm.shipment_complete_yn),
+            //품목명과 회사 parsing
+            productName: sameProduct.productName,
+            company: sameProduct.company,
+            //고유 id가져오기. 받아오는 것만 하고 보내는 건 하지않음
+            orderId: elm.order_id,
+          };
+        });
+        setOrder(copy);
+        //자동정렬위해 state변경
+        setSortState(sortState + 1);
+      } catch (err) {
+        console.log(err);
+      }
     }
   };
   // 페이지가 로드되거나 thisMonthYear의 값이 바뀌면 서버에서 product 데이터 받아오는 함수 실행
@@ -771,7 +782,7 @@ function App() {
                     ▶︎
                   </button>
                 </h1>
-                <div>
+                <div className="header-btn">
                   <button
                     id="deleteBtn"
                     type="button"
@@ -787,6 +798,15 @@ function App() {
                     }}
                   >
                     생산관리로 이동
+                  </button>
+                </div>
+                <div className="header-PCbtn">
+                  <button
+                    onClick={() => {
+                      changePCPage();
+                    }}
+                  >
+                    품목코드 정보
                   </button>
                 </div>
               </div>

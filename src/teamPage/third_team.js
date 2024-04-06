@@ -101,6 +101,31 @@ const ThirdTeam = (props) => {
     changeDay();
   }, [dayCount]);
 
+  // product_code와 name,company 데이터를 담을 state
+  let [product, setProduct] = useState([]);
+
+  // getProductCode를 실행하고나서 서버에서 order데이터를 받아오기 위해 useEffect에 쓸 state 생성
+  let [productDataState, setProductDataState] = useState(0);
+
+  // productCode목록 서버에서 가져오기
+  const getProductCode = async () => {
+    try {
+      let res = await axios.get('http://localhost:3001/api/productcode');
+      let copy = res.data.map((elm) => {
+        return {
+          productCode: elm.product_code,
+          productName: elm.product_name,
+          company: elm.company,
+          id: elm.id,
+        };
+      });
+      setProduct(copy);
+      setProductDataState(productDataState + 1);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   //order를 담아서 렌더링할 state생성
   let [order3, setOrder3] = useState([]);
 
@@ -149,10 +174,15 @@ const ThirdTeam = (props) => {
       console.log(err);
     }
   };
-  //마운트될때와 날짜 바뀔 때 불러오기
+  //마운트될 때와 날짜 바뀔 때 품목코드 데이터(product) 가져오기
+  useEffect(() => {
+    getProductCode();
+  }, [thisMonthYear]);
+
+  //productDataState 바뀔 때 리스트 데이터 불러오기
   useEffect(() => {
     getServerOrderList();
-  }, [thisMonthYear]);
+  }, [productDataState]);
 
   //생산완료 변경함수. 서버연결까지
   const changeProductComplete_yn = async (idx) => {

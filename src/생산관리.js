@@ -3,7 +3,7 @@ import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import './App.css';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
-import product from './product';
+
 import axios from 'axios';
 
 const ProductManagement = (props) => {
@@ -43,6 +43,31 @@ const ProductManagement = (props) => {
       let copy = { ...thisMonthYear };
       copy.month += 1;
       setThisMonthYear(copy);
+    }
+  };
+
+  // product_code와 name,company 데이터를 담을 state
+  let [product, setProduct] = useState([]);
+
+  // getProductCode를 실행하고나서 서버에서 order데이터를 받아오기 위해 useEffect에 쓸 state 생성
+  let [productDataState, setProductDataState] = useState(0);
+
+  // productCode목록 서버에서 가져오기
+  const getProductCode = async () => {
+    try {
+      let res = await axios.get('http://localhost:3001/api/productcode');
+      let copy = res.data.map((elm) => {
+        return {
+          productCode: elm.product_code,
+          productName: elm.product_name,
+          company: elm.company,
+          id: elm.id,
+        };
+      });
+      setProduct(copy);
+      setProductDataState(productDataState + 1);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -187,55 +212,63 @@ const ProductManagement = (props) => {
 
   //서버에서 데이터 받아오기
   const getServerOrderList2 = async () => {
-    let thisMonthYearCopy =
-      `${thisMonthYear.year}`.slice(-2) +
-      String(thisMonthYear.month).padStart(2, '0');
-    try {
-      let res = await axios.get(
-        'http://localhost:3001/api/product/' + thisMonthYearCopy
-      );
-      //parsing작업
-      let copy = res.data.map((elm, idx) => {
-        //품목코드 조회해서 품목명과 회사 저장
-        let product_codeValue = elm.product_code;
-        let sameProduct = product.find(
-          (elm) => product_codeValue === elm.productCode
+    //품목코드 데이터가 있을 때만 실행
+    if (product[0]) {
+      let thisMonthYearCopy =
+        `${thisMonthYear.year}`.slice(-2) +
+        String(thisMonthYear.month).padStart(2, '0');
+      try {
+        let res = await axios.get(
+          'http://localhost:3001/api/product/' + thisMonthYearCopy
         );
-        return {
-          orderCode: elm.order_code,
-          startDay: elm.order_start_date,
-          emergency: Number(elm.emergency_yn),
-          productCode: elm.product_code,
-          quantity: elm.product_quantity,
-          endDay: elm.order_end_date,
-          etc: elm.etc1,
-          etc2: elm.etc2,
-          color: elm.color,
-          team: elm.product_team,
-          orderSheetPublish: Number(elm.ordersheet_publish_yn),
-          orderSheetCollect: Number(elm.ordersheet_collect_yn),
-          report: Number(elm.report_yn),
-          specialNote: elm.special_note,
-          specialNote_yn: Number(elm.special_note_yn),
-          product_complete_yn: Number(elm.product_complete_yn),
-          shipment_complete_yn: Number(elm.shipment_complete_yn),
-          //품목명과 회사 parsing
-          productName: sameProduct.productName,
-          company: sameProduct.company,
-          //id 받아오기
-          orderId: elm.order_id,
-        };
-      });
-      setOrder2(copy);
-      setSortState(sortState + 1);
-    } catch (err) {
-      console.log(err);
+        //parsing작업
+        let copy = res.data.map((elm, idx) => {
+          //품목코드 조회해서 품목명과 회사 저장
+          let product_codeValue = elm.product_code;
+          let sameProduct = product.find(
+            (elm) => product_codeValue === elm.productCode
+          );
+          return {
+            orderCode: elm.order_code,
+            startDay: elm.order_start_date,
+            emergency: Number(elm.emergency_yn),
+            productCode: elm.product_code,
+            quantity: elm.product_quantity,
+            endDay: elm.order_end_date,
+            etc: elm.etc1,
+            etc2: elm.etc2,
+            color: elm.color,
+            team: elm.product_team,
+            orderSheetPublish: Number(elm.ordersheet_publish_yn),
+            orderSheetCollect: Number(elm.ordersheet_collect_yn),
+            report: Number(elm.report_yn),
+            specialNote: elm.special_note,
+            specialNote_yn: Number(elm.special_note_yn),
+            product_complete_yn: Number(elm.product_complete_yn),
+            shipment_complete_yn: Number(elm.shipment_complete_yn),
+            //품목명과 회사 parsing
+            productName: sameProduct.productName,
+            company: sameProduct.company,
+            //id 받아오기
+            orderId: elm.order_id,
+          };
+        });
+        setOrder2(copy);
+        setSortState(sortState + 1);
+      } catch (err) {
+        console.log(err);
+      }
     }
   };
-  //thisMonthYear바뀔때마다, mount될 때 서버에서 데이터 받아오기
+
+  //thisMonthYear바뀔때마다,mount될 때 서버에서 품목코드 데이터 받아오기
+  useEffect(() => {
+    getProductCode();
+  }, [thisMonthYear]);
+  //productDataState가 변경될 때(서버에서 품목코드 데이터를 받아온 후) 서버에서 리스트 데이터 받아오기
   useEffect(() => {
     getServerOrderList2();
-  }, [thisMonthYear]);
+  }, [productDataState]);
 
   //정렬
   // 발주번호 정렬

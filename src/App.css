@@ -31,13 +31,18 @@ th {
   padding-bottom: 3vh;
   position: relative;
 }
-.header div {
+.header-btn {
   position: absolute;
   left: 70vw;
   top: 8vh;
 }
-.header button {
+.header-btn button {
   margin-right: 0.5vw;
+}
+.header-PCbtn {
+  position: absolute;
+  left: 20vw;
+  top: 8vh;
 }
 .main {
   display: flex;
