@@ -16,4 +16,3 @@ let product = [
   { id: 9, productCode: 'AS789', productName: '총', company: '중앙' },
   { id: 10, productCode: 'ssss1234', productName: '반도체', company: '삼성' },
 ];
-export default product;

@@ -370,3 +370,20 @@ app.delete('/api/productcode/del/:id', (req, res) => {
     }
   });
 });
+
+//product_code 페이지에서 삭제할 때 product_management 테이블에 사용중인지 데이터 받아오기
+app.get('/api/product/code/:id', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  const q = `SELECT * FROM product_management WHERE product_code = ?`;
+
+  const product_code = req.params.id;
+
+  db.query(q, [product_code], (err, data) => {
+    if (!err) {
+      res.send(data);
+    } else {
+      console.log(err);
+      res.send(err);
+    }
+  });
+});

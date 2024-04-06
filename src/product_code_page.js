@@ -80,19 +80,36 @@ const ProductCodePage = () => {
     }
   };
 
+  //사용중인 품목코드 저장할 변수
+  let sameProductCode;
   //리스트에서 삭제하기. db에서도
   const deleteList = async (idx) => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
-      let copy = [...productCodeList];
-      copy.splice(idx, 1);
+      //똑같은 품목코드 사용중인지 서버에서 데이터 가져와서 확인
       try {
-        await axios.delete(
-          'http://localhost:3001/api/productcode/del/' + productCodeList[idx].id
+        sameProductCode = await axios.get(
+          'http://localhost:3001/api/product/code/' +
+            productCodeList[idx].productCode
         );
       } catch (err) {
         console.log(err);
       }
-      setProductCodeList(copy);
+      // 이미 사용중인 발주목록이 하나라도 있다면
+      if (sameProductCode.data[0]) {
+        alert('이미 사용중인 발주목록이 존재합니다');
+      } else {
+        let copy = [...productCodeList];
+        copy.splice(idx, 1);
+        try {
+          await axios.delete(
+            'http://localhost:3001/api/productcode/del/' +
+              productCodeList[idx].id
+          );
+        } catch (err) {
+          console.log(err);
+        }
+        setProductCodeList(copy);
+      }
     }
   };
 
