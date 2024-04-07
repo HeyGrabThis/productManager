@@ -4,6 +4,7 @@ CREATE DATABASE management default CHARACTER SET UTF8;
 use management;
 -- 테이블 생성
 create table product_management (
+    order_id int NOT NULL AUTO_INCREMENT,
     order_code varchar(11) NOT NULL,
     order_start_date varchar(10),
     emergency_yn varchar(1),
@@ -21,7 +22,6 @@ create table product_management (
     product_complete_yn varchar(1),
     shipment_complete_yn varchar(1),
     special_note_yn varchar(1), 
-    order_id int NOT NULL,
     PRIMARY KEY(order_code,order_id)
 );
 -- 임시 데이터 INSERT
@@ -52,3 +52,12 @@ DB 호출
 GRID -> for 하나의 행당 DB 호출
 
 DB 입장에서 하나의 행당 처리됨...///
+
+-- product_code 
+create table product_code (
+    id int NOT NULL AUTO_INCREMENT,
+    product_code varchar(15) NOT NULL,
+    product_name varchar(255),
+    company varchar(255),
+    PRIMARY KEY(id,product_code)
+);
