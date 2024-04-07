@@ -114,9 +114,16 @@ function App() {
   });
   // 발주 신규 추가하기. 바로 서버에 추가
   const addOrder = async () => {
+    //데이터에 있는 품목코드만 있는 배열만들기
+    const productCodes = product.map((elm) => {
+      return elm.productCode;
+    });
     //날짜를 지정하지 않으면 (orderCode가 없는 경우)또는 품목코드가 없는 경우 추가 못하도록
     if (!orderCopy.startDay || !orderCopy.productCode) {
       alert('발주일과 품목코드를 입력해주세요');
+    } else if (productCodes.indexOf(orderCopy.productCode) === -1) {
+      //입력한 품목코드가 없는 코드라면
+      alert('존재하지 않는 품목입니다');
     } else {
       let copy = [...order];
       // 그 달에 해당하는 데이터인지 판단해서 프론트에 보이는 것 조절
@@ -459,32 +466,18 @@ function App() {
 
   // 수정완료한 값들 다시 원래 배열에 넣기. 서버에도 적용
   const addModify = async (idx) => {
+    //데이터에 있는 품목코드만 있는 배열만들기
+    const productCodes = product.map((elm) => {
+      return elm.productCode;
+    });
     //날짜를 지정하지 않으면 (orderCode가 없는 경우)또는 품목코드가 없는 경우 추가 못하도록
     if (!orderCopy.startDay || !orderCopy.productCode) {
       alert('발주일과 품목코드를 입력해주세요');
       setAddState(-1);
-      setOrderCopy({
-        checked: 0,
-        orderCode: '',
-        startDay: '',
-        emergency: 0,
-        company: '',
-        productCode: '',
-        productName: '',
-        quantity: 0,
-        endDay: '',
-        etc: '',
-        etc2: '',
-        color: '',
-        team: '',
-        orderSheetPublish: 0,
-        orderSheetCollect: 0,
-        report: 0,
-        specialNote: '',
-        specialNote_yn: 0,
-        product_complete_yn: 0,
-        shipment_complete_yn: 0,
-      });
+    } else if (productCodes.indexOf(orderCopy.productCode) === -1) {
+      //입력한 품목코드가 없는 코드라면
+      alert('존재하지 않는 품목입니다');
+      setAddState(-1);
     } else {
       let copy = [...order];
       // 그 달에 해당하는 데이터인지 판단해서 프론트에 보이는 것 조절
