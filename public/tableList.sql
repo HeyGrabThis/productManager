@@ -22,7 +22,7 @@ create table product_management (
     product_complete_yn varchar(1),
     shipment_complete_yn varchar(1),
     special_note_yn varchar(1), 
-    PRIMARY KEY(order_code,order_id)
+    PRIMARY KEY(order_id, order_code)
 );
 -- 임시 데이터 INSERT
 INSERT INTO product_management (order_code, order_start_date, emergency_yn, product_code, product_quantity, order_end_date, etc1)
