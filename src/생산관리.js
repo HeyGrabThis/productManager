@@ -5,6 +5,7 @@ import './App.css';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 
 import axios from 'axios';
+import { CSVLink } from 'react-csv';
 
 const ProductManagement = (props) => {
   let navigate = useNavigate();
@@ -359,6 +360,67 @@ const ProductManagement = (props) => {
     sortOrderCode();
   }, [sortState]);
 
+  // excel로 export
+  let excelHeaders = [
+    { label: '발주번호', key: 'orderCode' },
+    { label: '긴급발주', key: 'emergency' },
+    { label: '고객사', key: 'company' },
+    { label: '품목코드', key: 'productCode' },
+    { label: '품목명', key: 'productName' },
+    { label: '발주수량', key: 'quantity' },
+    { label: 'COLOR', key: 'color' },
+    { label: '발주일', key: 'startDay' },
+    { label: '납기일', key: 'endDay' },
+    { label: '생산팀', key: 'team' },
+    { label: 'Order Sheet 발행', key: 'orderSheetPublish' },
+    { label: 'Order Sheet 회수', key: 'orderSheetCollect' },
+    { label: '성적서 발행', key: 'report' },
+    { label: '특이사항', key: 'specialNote' },
+    { label: '비고', key: 'etc2' },
+  ];
+  let [excelData, setExcelData] = useState([
+    {
+      orderCode: '',
+      emergency: '',
+      company: '',
+      productCode: '',
+      productName: '',
+      quantity: '',
+      color: '',
+      startDay: '',
+      endDay: '',
+      team: '',
+      orderSheetPublish: '',
+      orderSheetCollect: '',
+      report: '',
+      specialNote: '',
+      etc2: '',
+    },
+  ]);
+  // 목록을 돌며 excelData와 parsing
+  const exportExcel = () => {
+    let copy = order2.map((elm) => {
+      return {
+        orderCode: elm.orderCode,
+        emergency: elm.emergency === 1 ? '긴급' : null,
+        company: elm.company,
+        productCode: elm.productCode,
+        productName: elm.productName,
+        quantity: elm.quantity,
+        color: elm.color,
+        startDay: elm.startDay,
+        endDay: elm.endDay,
+        team: elm.team,
+        orderSheetPublish: elm.orderSheetPublish === 1 ? '발행완료' : null,
+        orderSheetCollect: elm.orderSheetCollect === 1 ? '회수완료' : null,
+        report: elm.report === 1 ? '발행완료' : null,
+        specialNote: elm.specialNote,
+        etc2: elm.etc2,
+      };
+    });
+    setExcelData(copy);
+  };
+
   return (
     <div>
       <div className="title">
@@ -396,6 +458,13 @@ const ProductManagement = (props) => {
           >
             발주관리로 이동
           </button>
+          <ExcelDownload
+            excelData={excelData}
+            excelHeaders={excelHeaders}
+            exportExcel={exportExcel}
+            thisMonthYear={thisMonthYear}
+            className="excelBtn"
+          ></ExcelDownload>
         </div>
       </div>
       <div className="product-main">
@@ -636,6 +705,33 @@ const ProductManagement = (props) => {
         </table>
       </div>
     </div>
+  );
+};
+//엑셀 export위한 컴포넌트
+const ExcelDownload = ({
+  excelData,
+  excelHeaders,
+  exportExcel,
+  thisMonthYear,
+}) => {
+  return (
+    <button
+      onClick={() => {
+        exportExcel();
+      }}
+    >
+      <CSVLink
+        headers={excelHeaders}
+        data={excelData}
+        filename={
+          thisMonthYear.year + '년' + thisMonthYear.month + '월 생산계획.csv'
+        }
+        target="_blank"
+        className="excelBtn"
+      >
+        엑셀파일로 다운로드
+      </CSVLink>
+    </button>
   );
 };
 

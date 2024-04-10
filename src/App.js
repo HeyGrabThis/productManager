@@ -7,6 +7,8 @@ import FirstTeam from './teamPage/first_team';
 import SecondTeam from './teamPage/second_team';
 import ThirdTeam from './teamPage/third_team';
 import ProductCodePage from './product_code_page';
+//엑셀로 export위해서
+import { CSVLink } from 'react-csv';
 
 function App() {
   let navigate = useNavigate();
@@ -735,12 +737,54 @@ function App() {
     getServerOrderList();
   }, [productDataState]);
 
-  // orderlist데이터를 받아오면 발주번호로 자동 정렬하도록 state생성
+  // orderlist데이터를 받아오면 발주번호로 자동 정렬하도록 state생성.
   let [sortState, setSortState] = useState(0);
   useEffect(() => {
     sortOrderCode();
   }, [sortState]);
 
+  // excel로 export
+  let excelHeaders = [
+    { label: '발주번호', key: 'orderCode' },
+    { label: '발주일', key: 'startDay' },
+    { label: '긴급발주', key: 'emergency' },
+    { label: '고객사', key: 'company' },
+    { label: '품목코드', key: 'productCode' },
+    { label: '품목명', key: 'productName' },
+    { label: '발주수량', key: 'quantity' },
+    { label: '납기일', key: 'endDay' },
+    { label: '비고', key: 'etc' },
+  ];
+  let [excelData, setExcelData] = useState([
+    {
+      orderCode: '',
+      startDay: '',
+      emergency: '',
+      company: '',
+      productCode: '',
+      productName: '',
+      quantity: '',
+      endDay: '',
+      etc: '',
+    },
+  ]);
+  // 목록을 돌며 excelData와 parsing
+  const exportExcel = () => {
+    let copy = order.map((elm) => {
+      return {
+        orderCode: elm.orderCode,
+        startDay: elm.startDay,
+        emergency: elm.emergency === 1 ? '긴급' : null,
+        company: elm.company,
+        productCode: elm.productCode,
+        productName: elm.productName,
+        quantity: elm.quantity,
+        endDay: elm.endDay,
+        etc: elm.etc,
+      };
+    });
+    setExcelData(copy);
+  };
   return (
     <Routes>
       <Route
@@ -801,6 +845,13 @@ function App() {
                   >
                     품목코드 정보
                   </button>
+                  <ExcelDownload
+                    excelData={excelData}
+                    excelHeaders={excelHeaders}
+                    exportExcel={exportExcel}
+                    thisMonthYear={thisMonthYear}
+                    className="excelBtn"
+                  ></ExcelDownload>
                 </div>
               </div>
               <div className="main">
@@ -1259,6 +1310,34 @@ const AddModifyBtn = (props) => {
       }}
     >
       수정완료
+    </button>
+  );
+};
+
+//엑셀 export위한 컴포넌트
+const ExcelDownload = ({
+  excelData,
+  excelHeaders,
+  exportExcel,
+  thisMonthYear,
+}) => {
+  return (
+    <button
+      onClick={() => {
+        exportExcel();
+      }}
+    >
+      <CSVLink
+        headers={excelHeaders}
+        data={excelData}
+        filename={
+          thisMonthYear.year + '년' + thisMonthYear.month + '월 발주관리.csv'
+        }
+        target="_blank"
+        className="excelBtn"
+      >
+        엑셀파일로 다운로드
+      </CSVLink>
     </button>
   );
 };
