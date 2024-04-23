@@ -1,11 +1,17 @@
 const express = require('express'); // npm i express | yarn add express
 const cors = require('cors'); // npm i cors | yarn add cors
 const db = require('./config/db'); // npm i mysql | yarn add mysql
+const path = require('path');
 const app = express();
 const PORT = 3001;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(__dirname, '../build')));
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, '../build/index.html'));
+});
 
 app.listen(PORT, () => {
   console.log(`Server On : http://localhost:${PORT}/`);
@@ -386,4 +392,8 @@ app.get('/api/product/code/:id', (req, res) => {
       res.send(err);
     }
   });
+});
+
+app.get('*', function (req, res) {
+  res.sendFile(path.join(__dirname, '../build/index.html'));
 });
