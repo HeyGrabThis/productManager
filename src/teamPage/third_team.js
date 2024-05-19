@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css';
-import product from '../product';
+import { CSVLink } from 'react-csv';
 
 const ThirdTeam = (props) => {
   let nowDate = new Date();
@@ -110,7 +110,7 @@ const ThirdTeam = (props) => {
   // productCode목록 서버에서 가져오기
   const getProductCode = async () => {
     try {
-      let res = await axios.get('http://localhost:3001/api/productcode');
+      let res = await axios.get(process.env.ADRESS + '/api/productcode');
       let copy = res.data.map((elm) => {
         return {
           productCode: elm.product_code,
@@ -140,7 +140,7 @@ const ThirdTeam = (props) => {
 
     try {
       let res = await axios.get(
-        'http://localhost:3001/api/team3/' + thisMonthYearCopy
+        process.env.ADRESS + '/api/team3/' + thisMonthYearCopy
       );
       let copy = res.data.map((elm, idx) => {
         //품목코드 조회해서 품목명과 회사 저장
@@ -197,7 +197,8 @@ const ThirdTeam = (props) => {
     }
     try {
       await axios.put(
-        'http://localhost:3001/api/product/update/product_complete_yn/' +
+        process.env.ADRESS +
+          '/api/product/update/product_complete_yn/' +
           order3[idx].orderId,
         {
           product_complete_yn: order3[idx].product_complete_yn,
@@ -221,7 +222,8 @@ const ThirdTeam = (props) => {
     }
     try {
       await axios.put(
-        'http://localhost:3001/api/product/update/shipment_complete_yn/' +
+        process.env.ADRESS +
+          '/api/product/update/shipment_complete_yn/' +
           order3[idx].orderId,
         {
           shipment_complete_yn: order3[idx].shipment_complete_yn,
@@ -245,7 +247,8 @@ const ThirdTeam = (props) => {
     }
     try {
       await axios.put(
-        'http://localhost:3001/api/product/update/specialNote_yn/' +
+        process.env.ADRESS +
+          '/api/product/update/specialNote_yn/' +
           order3[idx].orderId,
         {
           special_note_yn: order3[idx].specialNote_yn,
@@ -310,6 +313,52 @@ const ThirdTeam = (props) => {
     sortOrderCode();
   }, [sortState]);
 
+  // excel로 export
+  let excelHeaders = [
+    { label: '발주번호', key: 'orderCode' },
+
+    { label: '고객사', key: 'company' },
+    { label: '품목코드', key: 'productCode' },
+    { label: '품목명', key: 'productName' },
+    { label: '발주수량', key: 'quantity' },
+    { label: 'COLOR', key: 'color' },
+    { label: '생산완료', key: 'product_complete_yn' },
+    { label: '출하완료', key: 'shipment_complete_yn' },
+    { label: '특이사항', key: 'specialNote_yn' },
+  ];
+  let [excelData, setExcelData] = useState([
+    {
+      orderCode: '',
+
+      company: '',
+      productCode: '',
+      productName: '',
+      quantity: '',
+      color: '',
+      product_complete_yn: '',
+      shipment_complete_yn: '',
+      specialNote_yn: '',
+    },
+  ]);
+  // 목록을 돌며 excelData와 parsing
+  const exportExcel = () => {
+    let copy = order3.map((elm) => {
+      return {
+        orderCode: elm.orderCode,
+
+        company: elm.company,
+        productCode: elm.productCode,
+        productName: elm.productName,
+        quantity: elm.quantity,
+        color: elm.color,
+        product_complete_yn: elm.product_complete_yn === 1 ? '완료' : null,
+        shipment_complete_yn: elm.shipment_complete_yn === 1 ? '완료' : null,
+        specialNote_yn: elm.specialNote_yn === 1 ? '유' : '무',
+      };
+    });
+    setExcelData(copy);
+  };
+
   return (
     <div>
       <div className="teamTitle">
@@ -329,6 +378,13 @@ const ThirdTeam = (props) => {
           >
             오늘로 이동
           </button>
+          <ExcelDownload
+            excelData={excelData}
+            excelHeaders={excelHeaders}
+            exportExcel={exportExcel}
+            thisMonthYear={thisMonthYear}
+            className="excelBtn"
+          ></ExcelDownload>
         </div>
       </div>
       <div className="teamMain">
@@ -488,6 +544,39 @@ const ThirdTeam = (props) => {
         </div>
       </div>
     </div>
+  );
+};
+
+//엑셀 export위한 컴포넌트
+const ExcelDownload = ({
+  excelData,
+  excelHeaders,
+  exportExcel,
+  thisMonthYear,
+}) => {
+  return (
+    <button
+      onClick={() => {
+        exportExcel();
+      }}
+    >
+      <CSVLink
+        headers={excelHeaders}
+        data={excelData}
+        filename={
+          thisMonthYear.year +
+          '년' +
+          thisMonthYear.month +
+          '월' +
+          thisMonthYear.date +
+          '일 3팀 납기.csv'
+        }
+        target="_blank"
+        className="excelBtn"
+      >
+        엑셀파일로 다운로드
+      </CSVLink>
+    </button>
   );
 };
 
