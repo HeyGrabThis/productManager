@@ -72,7 +72,9 @@ function App() {
   // productCode목록 서버에서 가져오기
   const getProductCode = async () => {
     try {
-      let res = await axios.get(process.env.ADDRESS + '/api/productcode');
+      let res = await axios.get(
+        process.env.REACT_APP_ADDRESS + '/api/productcode'
+      );
       let copy = res.data.map((elm) => {
         return {
           productCode: elm.product_code,
@@ -138,25 +140,28 @@ function App() {
         setOrder(copy);
       }
       try {
-        await axios.post(process.env.ADDRESS + '/api/product/insert', {
-          color: '',
-          emergency_yn: orderCopy.emergency,
-          etc1: orderCopy.etc,
-          etc2: '',
-          order_code: orderCopy.orderCode,
-          order_end_date: orderCopy.endDay,
-          order_start_date: orderCopy.startDay,
-          ordersheet_collect_yn: 0,
-          ordersheet_publish_yn: 0,
-          product_code: orderCopy.productCode,
-          product_complete_yn: 0,
-          product_quantity: orderCopy.quantity,
-          product_team: '',
-          report_yn: 0,
-          shipment_complete_yn: 0,
-          special_note: '',
-          special_note_yn: '',
-        });
+        await axios.post(
+          process.env.REACT_APP_ADDRESS + '/api/product/insert',
+          {
+            color: '',
+            emergency_yn: orderCopy.emergency,
+            etc1: orderCopy.etc,
+            etc2: '',
+            order_code: orderCopy.orderCode,
+            order_end_date: orderCopy.endDay,
+            order_start_date: orderCopy.startDay,
+            ordersheet_collect_yn: 0,
+            ordersheet_publish_yn: 0,
+            product_code: orderCopy.productCode,
+            product_complete_yn: 0,
+            product_quantity: orderCopy.quantity,
+            product_team: '',
+            report_yn: 0,
+            shipment_complete_yn: 0,
+            special_note: '',
+            special_note_yn: '',
+          }
+        );
       } catch (err) {
         console.log(err);
       }
@@ -239,7 +244,7 @@ function App() {
       try {
         //서버에서 년도,달,날짜 같은 ordercode리스트 가져오기
         const sameDateList = await axios.get(
-          process.env.ADDRESS +
+          process.env.REACT_APP_ADDRESS +
             '/api/product/' +
             `${value[2]}` +
             `${value[3]}` +
@@ -411,7 +416,9 @@ function App() {
           copy3.map(async (elm) => {
             try {
               await axios.delete(
-                process.env.ADDRESS + '/api/product/del/' + elm.orderId
+                process.env.REACT_APP_ADDRESS +
+                  '/api/product/del/' +
+                  elm.orderId
               );
             } catch (err) {
               console.log(err);
@@ -435,7 +442,9 @@ function App() {
     }
     try {
       await axios.put(
-        process.env.ADDRESS + '/api/product/update/list/' + order[idx].orderId,
+        process.env.REACT_APP_ADDRESS +
+          '/api/product/update/list/' +
+          order[idx].orderId,
         {
           emergency_yn: order[idx].emergency,
         }
@@ -498,7 +507,9 @@ function App() {
       // 서버 update
       try {
         await axios.put(
-          process.env.ADDRESS + '/api/product/update/' + orderCopy.orderId,
+          process.env.REACT_APP_ADDRESS +
+            '/api/product/update/' +
+            orderCopy.orderId,
           {
             emergency_yn: orderCopy.emergency,
             etc1: orderCopy.etc,
@@ -686,7 +697,7 @@ function App() {
         String(thisMonthYear.month).padStart(2, '0');
       try {
         let res = await axios.get(
-          process.env.ADDRESS + '/api/product/' + thisMonthYearCopy
+          process.env.REACT_APP_ADDRESS + '/api/product/' + thisMonthYearCopy
         );
         let copy = res.data.map((elm, idx) => {
           //품목코드 조회해서 품목명과 회사 저장
