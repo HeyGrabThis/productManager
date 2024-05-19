@@ -110,7 +110,7 @@ const ThirdTeam = (props) => {
   // productCode목록 서버에서 가져오기
   const getProductCode = async () => {
     try {
-      let res = await axios.get('http://localhost:3001/api/productcode');
+      let res = await axios.get(process.env.ADRESS + '/api/productcode');
       let copy = res.data.map((elm) => {
         return {
           productCode: elm.product_code,
@@ -140,7 +140,7 @@ const ThirdTeam = (props) => {
 
     try {
       let res = await axios.get(
-        'http://localhost:3001/api/team3/' + thisMonthYearCopy
+        process.env.ADRESS + '/api/team3/' + thisMonthYearCopy
       );
       let copy = res.data.map((elm, idx) => {
         //품목코드 조회해서 품목명과 회사 저장
@@ -197,7 +197,8 @@ const ThirdTeam = (props) => {
     }
     try {
       await axios.put(
-        'http://localhost:3001/api/product/update/product_complete_yn/' +
+        process.env.ADRESS +
+          '/api/product/update/product_complete_yn/' +
           order3[idx].orderId,
         {
           product_complete_yn: order3[idx].product_complete_yn,
@@ -221,7 +222,8 @@ const ThirdTeam = (props) => {
     }
     try {
       await axios.put(
-        'http://localhost:3001/api/product/update/shipment_complete_yn/' +
+        process.env.ADRESS +
+          '/api/product/update/shipment_complete_yn/' +
           order3[idx].orderId,
         {
           shipment_complete_yn: order3[idx].shipment_complete_yn,
@@ -245,7 +247,8 @@ const ThirdTeam = (props) => {
     }
     try {
       await axios.put(
-        'http://localhost:3001/api/product/update/specialNote_yn/' +
+        process.env.ADRESS +
+          '/api/product/update/specialNote_yn/' +
           order3[idx].orderId,
         {
           special_note_yn: order3[idx].specialNote_yn,

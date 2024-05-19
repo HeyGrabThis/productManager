@@ -7,7 +7,7 @@ const ProductCodePage = () => {
   // product_code table에서 데이터 가져오기
   const getProductCodeData = async () => {
     try {
-      let res = await axios.get('http://localhost:3001/api/productcode');
+      let res = await axios.get(process.env.ADRESS + '/api/productcode');
       const copy = res.data.map((elm) => {
         return {
           checked: 0,
@@ -69,7 +69,7 @@ const ProductCodePage = () => {
       setProductCodeList(copy);
 
       try {
-        await axios.post('http://localhost:3001/api/productcode/insert', {
+        await axios.post(process.env.ADRESS + '/api/productcode/insert', {
           product_code: productCodeInput.productCode,
           company: productCodeInput.company,
           product_name: productCodeInput.productName,
@@ -88,7 +88,8 @@ const ProductCodePage = () => {
       //똑같은 품목코드 사용중인지 서버에서 데이터 가져와서 확인
       try {
         sameProductCode = await axios.get(
-          'http://localhost:3001/api/product/code/' +
+          process.env.ADRESS +
+            '/api/product/code/' +
             productCodeList[idx].productCode
         );
       } catch (err) {
@@ -102,7 +103,8 @@ const ProductCodePage = () => {
         copy.splice(idx, 1);
         try {
           await axios.delete(
-            'http://localhost:3001/api/productcode/del/' +
+            process.env.ADRESS +
+              '/api/productcode/del/' +
               productCodeList[idx].id
           );
         } catch (err) {

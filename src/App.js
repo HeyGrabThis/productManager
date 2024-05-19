@@ -72,7 +72,7 @@ function App() {
   // productCode목록 서버에서 가져오기
   const getProductCode = async () => {
     try {
-      let res = await axios.get('http://localhost:3001/api/productcode');
+      let res = await axios.get(process.env.ADRESS + '/api/productcode');
       let copy = res.data.map((elm) => {
         return {
           productCode: elm.product_code,
@@ -138,7 +138,7 @@ function App() {
         setOrder(copy);
       }
       try {
-        await axios.post('http://localhost:3001/api/product/insert', {
+        await axios.post(process.env.ADRESS + '/api/product/insert', {
           color: '',
           emergency_yn: orderCopy.emergency,
           etc1: orderCopy.etc,
@@ -239,7 +239,8 @@ function App() {
       try {
         //서버에서 년도,달,날짜 같은 ordercode리스트 가져오기
         const sameDateList = await axios.get(
-          'http://localhost:3001/api/product/' +
+          process.env.ADRESS +
+            '/api/product/' +
             `${value[2]}` +
             `${value[3]}` +
             `${value[5]}` +
@@ -410,7 +411,7 @@ function App() {
           copy3.map(async (elm) => {
             try {
               await axios.delete(
-                'http://localhost:3001/api/product/del/' + elm.orderId
+                process.env.ADRESS + '/api/product/del/' + elm.orderId
               );
             } catch (err) {
               console.log(err);
@@ -434,7 +435,7 @@ function App() {
     }
     try {
       await axios.put(
-        'http://localhost:3001/api/product/update/list/' + order[idx].orderId,
+        process.env.ADRESS + '/api/product/update/list/' + order[idx].orderId,
         {
           emergency_yn: order[idx].emergency,
         }
@@ -497,7 +498,7 @@ function App() {
       // 서버 update
       try {
         await axios.put(
-          'http://localhost:3001/api/product/update/' + orderCopy.orderId,
+          process.env.ADRESS + '/api/product/update/' + orderCopy.orderId,
           {
             emergency_yn: orderCopy.emergency,
             etc1: orderCopy.etc,
@@ -685,7 +686,7 @@ function App() {
         String(thisMonthYear.month).padStart(2, '0');
       try {
         let res = await axios.get(
-          'http://localhost:3001/api/product/' + thisMonthYearCopy
+          process.env.ADRESS + '/api/product/' + thisMonthYearCopy
         );
         let copy = res.data.map((elm, idx) => {
           //품목코드 조회해서 품목명과 회사 저장
