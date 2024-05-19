@@ -56,7 +56,7 @@ const ProductManagement = (props) => {
   // productCode목록 서버에서 가져오기
   const getProductCode = async () => {
     try {
-      let res = await axios.get(process.env.ADRESS + '/api/productcode');
+      let res = await axios.get(process.env.ADDRESS + '/api/productcode');
       let copy = res.data.map((elm) => {
         return {
           productCode: elm.product_code,
@@ -80,7 +80,7 @@ const ProductManagement = (props) => {
     setOrder2(copy);
     try {
       await axios.put(
-        process.env.ADRESS + '/api/product/update/color/' + copy[idx].orderId,
+        process.env.ADDRESS + '/api/product/update/color/' + copy[idx].orderId,
         {
           color: value,
         }
@@ -98,7 +98,7 @@ const ProductManagement = (props) => {
     setOrder2(copy);
     try {
       await axios.put(
-        process.env.ADRESS + '/api/product/update/team/' + copy[idx].orderId,
+        process.env.ADDRESS + '/api/product/update/team/' + copy[idx].orderId,
         {
           product_team: value,
         }
@@ -119,7 +119,7 @@ const ProductManagement = (props) => {
     setOrder2(copy);
     try {
       await axios.put(
-        process.env.ADRESS +
+        process.env.ADDRESS +
           '/api/product/update/orderSheetPublish/' +
           copy[idx].orderId,
         {
@@ -142,7 +142,7 @@ const ProductManagement = (props) => {
     setOrder2(copy);
     try {
       await axios.put(
-        process.env.ADRESS +
+        process.env.ADDRESS +
           '/api/product/update/orderSheetCollect/' +
           copy[idx].orderId,
         {
@@ -165,7 +165,7 @@ const ProductManagement = (props) => {
     setOrder2(copy);
     try {
       await axios.put(
-        process.env.ADRESS + '/api/product/update/report/' + copy[idx].orderId,
+        process.env.ADDRESS + '/api/product/update/report/' + copy[idx].orderId,
         {
           report_yn: copy[idx].report,
         }
@@ -182,7 +182,7 @@ const ProductManagement = (props) => {
     setOrder2(copy);
     try {
       await axios.put(
-        process.env.ADRESS +
+        process.env.ADDRESS +
           '/api/product/update/specialNote/' +
           copy[idx].orderId,
         {
@@ -201,7 +201,7 @@ const ProductManagement = (props) => {
     setOrder2(copy);
     try {
       await axios.put(
-        process.env.ADRESS + '/api/product/update/etc2/' + copy[idx].orderId,
+        process.env.ADDRESS + '/api/product/update/etc2/' + copy[idx].orderId,
         {
           etc2: value,
         }
@@ -223,7 +223,7 @@ const ProductManagement = (props) => {
         String(thisMonthYear.month).padStart(2, '0');
       try {
         let res = await axios.get(
-          process.env.ADRESS + '/api/product/' + thisMonthYearCopy
+          process.env.ADDRESS + '/api/product/' + thisMonthYearCopy
         );
         //parsing작업
         let copy = res.data.map((elm, idx) => {

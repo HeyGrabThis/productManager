@@ -110,7 +110,7 @@ const FirstTeam = (props) => {
   // productCode목록 서버에서 가져오기
   const getProductCode = async () => {
     try {
-      let res = await axios.get(process.env.ADRESS + '/api/productcode');
+      let res = await axios.get(process.env.ADDRESS + '/api/productcode');
       let copy = res.data.map((elm) => {
         return {
           productCode: elm.product_code,
@@ -140,7 +140,7 @@ const FirstTeam = (props) => {
 
     try {
       let res = await axios.get(
-        process.env.ADRESS + '/api/team1/' + thisMonthYearCopy
+        process.env.ADDRESS + '/api/team1/' + thisMonthYearCopy
       );
       let copy = res.data.map((elm, idx) => {
         //품목코드 조회해서 품목명과 회사 저장
@@ -198,7 +198,7 @@ const FirstTeam = (props) => {
     }
     try {
       await axios.put(
-        process.env.ADRESS +
+        process.env.ADDRESS +
           '/api/product/update/product_complete_yn/' +
           order3[idx].orderId,
         {
@@ -223,7 +223,7 @@ const FirstTeam = (props) => {
     }
     try {
       await axios.put(
-        process.env.ADRESS +
+        process.env.ADDRESS +
           '/api/product/update/shipment_complete_yn/' +
           order3[idx].orderId,
         {
@@ -248,7 +248,7 @@ const FirstTeam = (props) => {
     }
     try {
       await axios.put(
-        process.env.ADRESS +
+        process.env.ADDRESS +
           '/api/product/update/specialNote_yn/' +
           order3[idx].orderId,
         {
