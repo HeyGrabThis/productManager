@@ -4,7 +4,7 @@ require('dotenv').config(); // npm install dotenv --save
 const db = mysql.createPool({
   host: process.env.HOST,
   port: process.env.PORT,
-  user: process.env.USER,
+  user: 'root',
   password: process.env.PASSWORD,
   database: process.env.DATABASE,
   multipleStatements: true,

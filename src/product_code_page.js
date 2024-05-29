@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-const ProductCodePage = () => {
+const ProductCodePage = (props) => {
   //product_code table에서 목록 가져올 state생성
   let [productCodeList, setProductCodeList] = useState([]);
   // product_code table에서 데이터 가져오기
@@ -162,6 +162,11 @@ const ProductCodePage = () => {
     );
     setProductCodeList(copy);
   };
+
+  //로그인 되어있는지 확인
+  useEffect(() => {
+    props.auth();
+  }, []);
   return (
     <div>
       <div className="code-topPage">

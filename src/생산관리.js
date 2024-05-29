@@ -434,6 +434,11 @@ const ProductManagement = (props) => {
     setExcelData(copy);
   };
 
+  //로그인 되어있는지 확인
+  useEffect(() => {
+    props.auth();
+  }, []);
+
   return (
     <div>
       <div className="title">

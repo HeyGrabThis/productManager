@@ -5,8 +5,16 @@ const path = require('path');
 const app = express();
 const PORT = 3001;
 
+const bodyParser = require('body-parser');
+
+//jwt
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, '../build')));
 app.get('/', function (req, res) {
@@ -24,6 +32,141 @@ app.use(
     optionsSuccessStatus: 200, // 응답 상태 200으로 설정
   })
 );
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// 사용자 등록
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  db.query(
+    'INSERT INTO user (username, password) VALUES (?, ?)',
+    [username, hashedPassword],
+    (err, results) => {
+      if (err) {
+        return res.status(500).send({ message: 'Error registering user' });
+      }
+      res.send({ message: 'User registered successfully' });
+    }
+  );
+});
+
+// 사용자 로그인
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  db.query(
+    'SELECT * FROM user WHERE username = ?',
+    [username],
+    async (err, results) => {
+      try {
+        if (err) {
+          return res.status(500).send({ message: 'Error logging in' });
+        }
+
+        if (results.length === 0) {
+          return res.status(401).send({ message: 'Invalid credentials' });
+        }
+
+        const user = results[0];
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+          return res.status(401).send({ message: 'Invalid credentials' });
+        }
+
+        // 지속시간 3시간인 토큰 생성
+        const token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, {
+          expiresIn: '3h',
+        });
+        // 토큰 db에 저장
+        db.query(
+          'UPDATE user SET token = ? WHERE id = ?',
+          [token, user.id],
+          (err, data) => {
+            if (err) {
+              res.send(err);
+            }
+          }
+        );
+        res.cookie('product_auth', token).send({
+          id: user.id,
+          username: username,
+          message: 'Logged in successfully',
+          token,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  );
+});
+
+// 인증된 사용자 정보 조회
+const auth = async (req, res, next) => {
+  try {
+    //클라이언트 쿠키에서 토큰을 가져옴
+    let token = req.cookies.product_auth;
+
+    if (!token) {
+      return res
+        .status(401)
+        .send({ message: 'Not authenticated', loginStatus: false });
+    }
+    //토큰 디코딩
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+
+    db.query(
+      'SELECT * FROM user WHERE id = ?',
+      [decoded.id],
+      (err, results) => {
+        if (err) {
+          return res
+            .status(500)
+            .send({ message: 'Error fetching user', loginStatus: false });
+        }
+        if (results.length === 0) {
+          return res
+            .status(404)
+            .send({ message: 'User not found', loginStatus: false });
+        }
+        //id로 찾은 것의 토큰과 지금 나의 토큰이 같다면 next로
+        if (results[0].token !== token) {
+          return res
+            .status(401)
+            .send({ message: 'Invalid token', loginStatus: false });
+        }
+        next();
+      }
+    );
+  } catch (err) {
+    return res.status(500).send({ message: err, loginStatus: false });
+  }
+};
+
+app.put('/logout', auth, (req, res) => {
+  let id = req.body.id;
+  const q = 'UPDATE user SET token="" WHERE id = ?';
+
+  //db의 토큰 없애기
+  db.query(q, [id], (err, data) => {
+    if (err) {
+      return res
+        .status(500)
+        .send({ message: 'Error logout', logoutStatus: false });
+    }
+    //로그아웃 성공, 쿠키의 토큰없애기
+    res
+      .clearCookie('product_auth')
+      .send({ message: 'Logout success', logoutStatus: true });
+  });
+});
+
+app.get('/user', auth, async (req, res) => {
+  res.status(200).send({ loginStatus: true });
+});
 
 //년도와 달 파라미터로 받아와서 get하기
 app.get('/api/product/:id', (req, res) => {
