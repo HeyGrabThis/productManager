@@ -34,9 +34,19 @@ const Login = (props) => {
         process.env.REACT_APP_ADDRESS + '/login',
         { username: username, password: password }
       );
+      if (response.data.message === 'no User') {
+        return alert('없는 아이디입니다.');
+      }
+      if (response.data.message === 'Invalid credentials') {
+        return alert('비밀번호가 일치하지 않습니다.');
+      }
+      if (response.data.message === 'Error logging in') {
+        return alert('로그인 에러');
+      }
       props.setUser(response.data);
       navigate('/', { replace: true });
     } catch (error) {
+      alert('로그인 실패');
       console.error('Login failed', error);
     }
   };
