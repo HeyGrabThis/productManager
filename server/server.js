@@ -67,7 +67,7 @@ app.post('/login', (req, res) => {
         }
 
         if (results.length === 0) {
-          return res.status(401).send({ message: 'Invalid credentials' });
+          return res.status(401).send({ message: 'no User' });
         }
 
         const user = results[0];
@@ -99,6 +99,7 @@ app.post('/login', (req, res) => {
         });
       } catch (err) {
         console.log(err);
+        throw err;
       }
     }
   );

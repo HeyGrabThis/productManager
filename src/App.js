@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import './App.css';
-import {
-  Routes,
-  Route,
-  Link,
-  useNavigate,
-  Outlet,
-  Navigate,
-} from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Main from './main';
 import ProductManagement from './생산관리';
 import FirstTeam from './teamPage/first_team';
